@@ -27,19 +27,19 @@ public class LinkUtils {
                 Logger.warn("Link was already checked! Stepping over!");
                 return checkedUrls.get(link);
             }
-            if(link.contains("mailto") || link.contains("tel:") || link.contains("sms:")){
-                checkedUrls.put(link, true);
-                return true;
-            }
-            if(link.startsWith("file:/")){
-                return checkDomain(link) && checkFileLinkExists(link);
-            }
             if(link.startsWith("https://") || link.startsWith("http://")) {
                 URL url = new URL(link);
                 String host = url.getHost();
                 boolean isValid = checkReachable(url) && checkDomain(host);
                 checkedUrls.put(link, isValid);
                 return isValid;
+            }
+            if(link.contains("mailto") || link.contains("tel:") || link.contains("sms:")){
+                checkedUrls.put(link, true);
+                return true;
+            }
+            if(link.startsWith("file:/")){
+                return checkDomain(link) && checkFileLinkExists(link);
             }
             return false;
         } catch (IOException e) {
