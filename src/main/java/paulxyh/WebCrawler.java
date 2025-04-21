@@ -1,6 +1,7 @@
 package paulxyh;
 
 import paulxyh.controller.CrawlerController;
+import paulxyh.util.logger.Logger;
 
 import java.util.Arrays;
 import java.util.List;
@@ -8,7 +9,7 @@ import java.util.List;
 public class WebCrawler {
     public static void main(String[] args) {
         if (args.length < 3) {
-            System.err.println("Usage: java WebCrawler <startURL> <depth> <domains>");
+            Logger.error("Usage: java WebCrawler <startURL> <depth> <domains>");
             System.exit(1);
         }
 
@@ -17,13 +18,15 @@ public class WebCrawler {
         try {
             maxDepth = Integer.parseInt(args[1]);
         } catch (NumberFormatException e) {
-            System.err.println("Depth must be an integer.");
+            Logger.error("Depth must be an integer.");
             return;
         }
 
         List<String> allowedDomains = Arrays.asList(args[2].split(","));
 
-        CrawlerController crawler = new CrawlerController(startUrl, maxDepth, allowedDomains);
-        crawler.run();
+        Logger.info("Initializing Crawler with url: " + startUrl);
+        CrawlerController crawler = new CrawlerController();
+        Logger.info("Starting Crawler");
+        crawler.run(startUrl, maxDepth, allowedDomains);
     }
 }
