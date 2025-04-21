@@ -4,13 +4,23 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import paulxyh.util.logger.Logger;
 
+import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 
 public class HTMLContentFetcherImpl implements HTMLContentFetcher {
     @Override
     public Document fetch(String url) {
         try {
-            return Jsoup.connect(url).get();
+            if(url.startsWith("file:")){
+                Logger.info("Fetching from local file: " + url);
+                File file = new File(URI.create(url));
+                return Jsoup.parse(file, "UTF-8", url);
+            }
+            else if(url.startsWith("https://") || url.startsWith("http://")) {
+                return Jsoup.connect(url).get();
+            }
+            return null;
         }
         catch (IOException e) {
             Logger.error("Error while fetching HTML content: " + e.getMessage());
