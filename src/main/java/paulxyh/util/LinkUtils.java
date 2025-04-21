@@ -1,4 +1,4 @@
-package com.util;
+package paulxyh.util;
 
 public class LinkUtils {
 //    TODO: Implement

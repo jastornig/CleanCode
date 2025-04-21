@@ -1,4 +1,4 @@
-package com.model;
+package paulxyh.model;
 
 public class PageResult {
 //    TODO: Implement
