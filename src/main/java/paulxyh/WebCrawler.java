@@ -1,6 +1,8 @@
 package paulxyh;
 
 import paulxyh.controller.CrawlerController;
+import paulxyh.exception.IncorrectInputException;
+import paulxyh.util.LinkUtils;
 import paulxyh.util.logger.Logger;
 
 import java.util.Arrays;
@@ -15,8 +17,13 @@ public class WebCrawler {
 
         String startUrl = args[0];
         int maxDepth;
+
         try {
+            LinkUtils.checkUrlFormatting(startUrl);
             maxDepth = Integer.parseInt(args[1]);
+        } catch (IncorrectInputException i){
+            Logger.error("Input URL must contain 'https://' or 'http://'!");
+            return;
         } catch (NumberFormatException e) {
             Logger.error("Depth must be an integer.");
             return;
