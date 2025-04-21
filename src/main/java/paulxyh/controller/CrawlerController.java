@@ -1,22 +1,30 @@
 package paulxyh.controller;
 
+import paulxyh.core.CrawlerEngine;
+import paulxyh.model.PageResult;
+import paulxyh.util.LinkUtils;
+import paulxyh.util.logger.Logger;
+import paulxyh.util.writer.MarkdownWriterImpl;
+import paulxyh.util.parser.HTMLParserImpl;
+
 import java.util.List;
 
 public class CrawlerController {
-    private String url;
-    private int maxDepth;
-    private List<String> allowedDomains;
+    private final String filename;
+    private final CrawlerEngine engine;
 
-    public CrawlerController(String url, int depth, List<String> allowedDomains){
-        this.url = url;
-        this.maxDepth = depth;
-        this.allowedDomains = allowedDomains;
+    public CrawlerController(){
+        this.filename = "crawler_report.md";
+        this.engine = new CrawlerEngine(new HTMLParserImpl());
     }
 
-//     TODO: Implement
-//        - Call the engine
-//        - Call the MarkdownWriter with the results
-    public void run(){
+    public void run(String url, int depth, List<String> allowedDomains){
+        Logger.info("Crawler started");
+        LinkUtils.setAllowedDomains(allowedDomains);
+        PageResult result = engine.crawl(url, depth);
 
+        Logger.info("Writing results to " + filename);
+        MarkdownWriterImpl writer = new MarkdownWriterImpl();
+        writer.write(result, filename);
     }
 }
