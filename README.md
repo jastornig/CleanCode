@@ -13,3 +13,11 @@ mvn clean install -Dexec.mainClass=paulxyh.WebCrawler -Dexec.args="<url> <depth>
 * `url` => The root url which the Crawler should target 
 * `depth` => The maximal depth the Crawler should go
 * `domains` => A comma seperated list of all possible domains
+
+## Testing
+
+Run the following maven command to run all Unit- and IntegrationTests:
+
+```bash
+mvn test
+```
