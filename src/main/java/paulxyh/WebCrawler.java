@@ -1,9 +1,13 @@
 package paulxyh;
 
 import paulxyh.controller.CrawlerController;
+import paulxyh.core.CrawlerEngine;
 import paulxyh.exception.IncorrectInputException;
 import paulxyh.util.LinkUtils;
 import paulxyh.util.logger.Logger;
+import paulxyh.util.parser.HTMLParserImpl;
+import paulxyh.util.writer.MarkdownWriter;
+import paulxyh.util.writer.MarkdownWriterImpl;
 
 import java.util.Arrays;
 import java.util.List;
@@ -32,7 +36,9 @@ public class WebCrawler {
         List<String> allowedDomains = Arrays.asList(args[2].split(","));
 
         Logger.info("Initializing Crawler with url: " + startUrl);
-        CrawlerController crawler = new CrawlerController();
+        CrawlerEngine engine = new CrawlerEngine(new HTMLParserImpl());
+        MarkdownWriter writer = new MarkdownWriterImpl();
+        CrawlerController crawler = new CrawlerController(engine, writer);
         Logger.info("Starting Crawler");
         crawler.run(startUrl, maxDepth, allowedDomains);
     }

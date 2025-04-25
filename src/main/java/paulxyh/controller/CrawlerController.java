@@ -4,18 +4,19 @@ import paulxyh.core.CrawlerEngine;
 import paulxyh.model.PageResult;
 import paulxyh.util.LinkUtils;
 import paulxyh.util.logger.Logger;
-import paulxyh.util.writer.MarkdownWriterImpl;
-import paulxyh.util.parser.HTMLParserImpl;
+import paulxyh.util.writer.MarkdownWriter;
 
 import java.util.List;
 
 public class CrawlerController {
     private final String filename;
     private final CrawlerEngine engine;
+    private final MarkdownWriter writer;
 
-    public CrawlerController(){
+    public CrawlerController(CrawlerEngine engine, MarkdownWriter writer){
         this.filename = "crawler_report.md";
-        this.engine = new CrawlerEngine(new HTMLParserImpl());
+        this.engine = engine;
+        this.writer = writer;
     }
 
     public void run(String url, int depth, List<String> allowedDomains){
@@ -24,7 +25,6 @@ public class CrawlerController {
         PageResult result = engine.crawl(url, depth);
 
         Logger.info("Writing results to " + filename);
-        MarkdownWriterImpl writer = new MarkdownWriterImpl();
         writer.write(result, filename);
     }
 }
