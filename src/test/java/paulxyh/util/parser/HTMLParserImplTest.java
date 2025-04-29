@@ -20,7 +20,7 @@ import static org.mockito.Mockito.*;
 
 @DisplayName("HTMLParserImpl Tests")
 public class HTMLParserImplTest {
-    private String parseUrl = "http://paulxyh.test.url";
+    private final String parseUrl = "http://paulxyh.test.url";
     private HTMLParserImpl parser;
     private Document document;
 
@@ -31,7 +31,7 @@ public class HTMLParserImplTest {
     }
 
     @Test
-    void testParseShouldParseHeadingCorrectly() throws Exception, ElementNotRecognizedException {
+    void testParseShouldParseHeadingCorrectly() throws ElementNotRecognizedException {
         Element heading = new Element("h2");
         heading.text("Test");
         Elements elements = new Elements(heading);
@@ -41,7 +41,6 @@ public class HTMLParserImplTest {
 
         assertEquals(1, result.size());
         assertInstanceOf(Heading.class, result.getFirst());
-
         Heading parsedHeading = (Heading) result.getFirst();
         assertEquals(2, parsedHeading.level());
         assertEquals("Test", parsedHeading.title());
@@ -53,14 +52,11 @@ public class HTMLParserImplTest {
         Element link = new Element("a");
         link.attr("href", validUrl);
         Elements elements = new Elements(link);
-
         mockDocumentBodyCalls(elements);
 
         try (MockedStatic<LinkUtils> utilities = mockStatic(LinkUtils.class)) {
             utilities.when(() -> LinkUtils.isLinkValid(validUrl)).thenReturn(true);
-
             List<PageElement> result = parser.parse(parseUrl, document);
-
             assertEquals(1, result.size());
             assertInstanceOf(Link.class, result.getFirst());
 
@@ -76,14 +72,11 @@ public class HTMLParserImplTest {
         Element link = new Element("a");
         link.attr("href", brokenUrl);
         Elements elements = new Elements(link);
-
         mockDocumentBodyCalls(elements);
 
         try (MockedStatic<LinkUtils> utilities = mockStatic(LinkUtils.class)) {
             utilities.when(() -> LinkUtils.isLinkValid(brokenUrl)).thenReturn(false);
-
             List<PageElement> result = parser.parse(parseUrl, document);
-
             assertEquals(1, result.size());
             assertInstanceOf(Link.class, result.getFirst());
 
@@ -101,17 +94,12 @@ public class HTMLParserImplTest {
 
         Element link2 = new Element("a");
         link2.attr("href", url);
-
         Elements elements = new Elements(link1, link2);
-
         mockDocumentBodyCalls(elements);
 
         try (MockedStatic<LinkUtils> utilities = mockStatic(LinkUtils.class)) {
             utilities.when(() -> LinkUtils.isLinkValid(url)).thenReturn(true);
-
             parser.parse(parseUrl, document);
-
-            // verify static method called only once
             utilities.verify(() -> LinkUtils.isLinkValid(url), times(1));
         }
     }
@@ -120,9 +108,7 @@ public class HTMLParserImplTest {
     void testParseThrowsElementNotRecognizedException() {
         Element unknown = new Element("div", "Some Div");
         Elements elements = new Elements(unknown);
-
         mockDocumentBodyCalls(elements);
-
         assertThrows(ElementNotRecognizedException.class, () -> {
             parser.parse(parseUrl, document);
         });

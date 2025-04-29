@@ -61,7 +61,7 @@ public class PageResultTest {
     @Test
     @DisplayName("getChildren() should return an empty list initially")
     void testGetChildrenIsEmptyInitially() {
-
+        assertTrue(this.result.getChildren().isEmpty());
     }
 
     @Test

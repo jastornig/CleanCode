@@ -22,8 +22,6 @@ import static paulxyh.util.LinkUtils.isLinkValid;
 
 @DisplayName("LinkUtils Tests")
 public class LinkUtilsTest {
-    private static final List<String> ALLOWED_DOMAINS = Arrays.asList("paulxyh.test", "test.url");
-
     @Mock
     private URLConnectionWrapper urlConnectionWrapperMock;
 
@@ -33,9 +31,7 @@ public class LinkUtilsTest {
     @BeforeEach
     public void setup() {
         MockitoAnnotations.openMocks(this);
-        // Set allowed domains
         LinkUtils.setAllowedDomains(Arrays.asList("paulxyh.test", "test.url"));
-        // Set the mocked URL connection wrapper
         LinkUtils.setConnectionWrapper(urlConnectionWrapperMock);
     }
 
@@ -46,9 +42,8 @@ public class LinkUtilsTest {
         when(urlConnectionWrapperMock.openConnection(any())).thenReturn(httpURLConnectionMock);
         when(httpURLConnectionMock.getResponseCode()).thenReturn(HttpURLConnection.HTTP_OK);
         LinkUtils.isLinkValid(link);
-        boolean result = LinkUtils.isLinkValid(link); // second check
+        boolean result = LinkUtils.isLinkValid(link);
 
-        // Assert that the result is true because the link is already checked
         assertTrue(result);
         verify(urlConnectionWrapperMock, times(1)).openConnection(any());
     }
@@ -75,7 +70,6 @@ public class LinkUtilsTest {
 
         boolean result = LinkUtils.isLinkValid(link);
 
-        // Assert that the link is not valid
         assertFalse(result);
         verify(urlConnectionWrapperMock, times(1)).openConnection(any());
     }
@@ -84,9 +78,7 @@ public class LinkUtilsTest {
     @DisplayName("isLinkValid() returns true for mailto link")
     public void testIsLinkValidMailto() {
         String link = "mailto:examplemail@test.com";
-
         boolean result = LinkUtils.isLinkValid(link);
-
         assertTrue(result);
     }
 
@@ -94,9 +86,7 @@ public class LinkUtilsTest {
     @DisplayName("isLinkValid() returns true for sms link")
     public void testIsLinkValidSMS() {
         String link = "sms:exampleNumber";
-
         boolean result = LinkUtils.isLinkValid(link);
-
         assertTrue(result);
     }
 
@@ -104,9 +94,7 @@ public class LinkUtilsTest {
     @DisplayName("isLinkValid() returns true for tel link")
     public void testIsLinkValidTel() {
         String link = "tel:exampleNumber";
-
         boolean result = LinkUtils.isLinkValid(link);
-
         assertTrue(result);
     }
 
@@ -148,7 +136,6 @@ public class LinkUtilsTest {
     @DisplayName("checkUrlFormatting() returns false for non http* links")
     public void testCheckUrlFormatting_invalidUrl() {
         String invalidUrl = "ftp://example.com";
-
         assertThrows(IncorrectInputException.class, () -> LinkUtils.checkUrlFormatting(invalidUrl));
     }
 }

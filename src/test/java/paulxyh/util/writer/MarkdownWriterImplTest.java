@@ -89,6 +89,7 @@ public class MarkdownWriterImplTest {
         when(builder.buildDepthText(anyInt())).thenReturn("");
     }
 
+    // see Visibility and Testing Disclaimer in README
     private String invokeWriteRecursively(PageResult result, int depth) {
         try {
             var method = MarkdownWriterImpl.class.getDeclaredMethod("writeRecursively", PageResult.class, int.class);

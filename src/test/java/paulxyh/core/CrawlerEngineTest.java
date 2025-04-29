@@ -14,17 +14,12 @@ import paulxyh.model.Heading;
 import paulxyh.model.Link;
 import paulxyh.model.PageResult;
 import paulxyh.util.fetcher.HTMLContentFetcher;
-import paulxyh.util.fetcher.HTMLContentFetcherImpl;
-import paulxyh.util.fetcher.JsoupWrapper;
-import paulxyh.util.fetcher.JsoupWrapperImpl;
 import paulxyh.util.parser.HTMLParser;
-import paulxyh.util.parser.HTMLParserImpl;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @DisplayName("CrawlerEngine Tests")
