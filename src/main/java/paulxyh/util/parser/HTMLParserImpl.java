@@ -11,17 +11,17 @@ import paulxyh.util.LinkUtils;
 
 import java.util.*;
 
-public class HTMLParserImpl implements HTMLParser{
+public class HTMLParserImpl implements HTMLParser {
     private List<PageElement> htmlElements;
     private final Map<String, Boolean> checkedUrls = new HashMap<>();
 
     @Override
-    public List<PageElement> parse(String url, Document content) throws ElementNotRecognizedException{
+    public List<PageElement> parse(String url, Document content) throws ElementNotRecognizedException {
         htmlElements = new ArrayList<>();
 
         Elements elements = content.body().select("h1, h2, h3, h4, h5, h6, a[href]");
 
-        for(Element element : elements){
+        for (Element element : elements) {
             parseToCorrectType(element);
         }
 
@@ -29,13 +29,11 @@ public class HTMLParserImpl implements HTMLParser{
     }
 
     private void parseToCorrectType(Element element) throws ElementNotRecognizedException {
-        if(element.tagName().matches("h[1-6]")) {
+        if (element.tagName().matches("h[1-6]")) {
             parseHeading(element);
-        }
-        else if (element.tagName().equals("a")) {
+        } else if (element.tagName().equals("a")) {
             parseLink(element);
-        }
-        else {
+        } else {
             throw new ElementNotRecognizedException();
         }
     }
@@ -48,6 +46,11 @@ public class HTMLParserImpl implements HTMLParser{
 
     private void parseLink(Element element) {
         String link = element.absUrl("href");
+        boolean isLinkValid = getIsLinkValid(link);
+        htmlElements.add(new Link(link, isLinkValid));
+    }
+
+    private boolean getIsLinkValid(String link) {
         boolean isLinkValid;
         if (checkedUrls.containsKey(link)) {
             isLinkValid = checkedUrls.get(link);
@@ -55,6 +58,6 @@ public class HTMLParserImpl implements HTMLParser{
             isLinkValid = LinkUtils.isLinkValid(link);
             checkedUrls.put(link, isLinkValid);
         }
-        htmlElements.add(new Link(link, isLinkValid));
+        return isLinkValid;
     }
 }

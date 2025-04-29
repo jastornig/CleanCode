@@ -17,19 +17,24 @@ public class PageResult {
     public String getUrl() {
         return url;
     }
+
     public int getDepth() {
         return depth;
     }
-    public List<PageElement> getElements(){
+
+    public List<PageElement> getElements() {
         return this.elements;
     }
-    public List<PageResult> getChildren(){
+
+    public List<PageResult> getChildren() {
         return this.children;
     }
-    public void addElement(PageElement element){
+
+    public void addElement(PageElement element) {
         this.elements.add(element);
     }
-    public void addChild(PageResult child){
+
+    public void addChild(PageResult child) {
         this.children.add(child);
     }
 }

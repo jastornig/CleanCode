@@ -4,7 +4,12 @@ import paulxyh.controller.CrawlerController;
 import paulxyh.core.CrawlerEngine;
 import paulxyh.exception.IncorrectInputException;
 import paulxyh.util.LinkUtils;
+import paulxyh.util.fetcher.HTMLContentFetcher;
+import paulxyh.util.fetcher.HTMLContentFetcherImpl;
+import paulxyh.util.fetcher.JsoupWrapper;
+import paulxyh.util.fetcher.JsoupWrapperImpl;
 import paulxyh.util.logger.Logger;
+import paulxyh.util.parser.HTMLParser;
 import paulxyh.util.parser.HTMLParserImpl;
 import paulxyh.util.writer.MarkdownWriter;
 import paulxyh.util.writer.MarkdownWriterImpl;
@@ -25,7 +30,7 @@ public class WebCrawler {
         try {
             LinkUtils.checkUrlFormatting(startUrl);
             maxDepth = Integer.parseInt(args[1]);
-        } catch (IncorrectInputException i){
+        } catch (IncorrectInputException i) {
             Logger.error("Input URL must contain 'https://' or 'http://'!");
             return;
         } catch (NumberFormatException e) {
@@ -36,9 +41,13 @@ public class WebCrawler {
         List<String> allowedDomains = Arrays.asList(args[2].split(","));
 
         Logger.info("Initializing Crawler with url: " + startUrl);
-        CrawlerEngine engine = new CrawlerEngine(new HTMLParserImpl());
+        HTMLParser parser = new HTMLParserImpl();
+        JsoupWrapper wrapper = new JsoupWrapperImpl();
+        HTMLContentFetcher fetcher = new HTMLContentFetcherImpl(wrapper);
+        CrawlerEngine engine = new CrawlerEngine(parser, fetcher);
         MarkdownWriter writer = new MarkdownWriterImpl();
         CrawlerController crawler = new CrawlerController(engine, writer);
+
         Logger.info("Starting Crawler");
         crawler.run(startUrl, maxDepth, allowedDomains);
     }

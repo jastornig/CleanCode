@@ -1,4 +1,4 @@
 package paulxyh.exception;
 
-public class WriterNotInitializedException extends Exception{
+public class WriterNotInitializedException extends Exception {
 }

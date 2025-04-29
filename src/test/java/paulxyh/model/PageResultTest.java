@@ -12,31 +12,33 @@ public class PageResultTest {
     private final String testUrl = "https://paulxyh.test.url";
     private final int testDepth = 1;
     private PageResult result;
+
     @BeforeEach
-    void init(){
+    void init() {
         this.result = new PageResult(this.testUrl, this.testDepth);
     }
+
     @Test
     @DisplayName("getUrl() should return the correct URL")
-    void testGetUrlReturnsCorrectUrl(){
+    void testGetUrlReturnsCorrectUrl() {
         assertEquals(this.testUrl, this.result.getUrl());
     }
 
     @Test
     @DisplayName("getDepth() should return the correct depth")
-    void testGetDepthReturnsCorrectDepth(){
+    void testGetDepthReturnsCorrectDepth() {
         assertEquals(this.testDepth, this.result.getDepth());
     }
 
     @Test
     @DisplayName("getElements() should return an empty list initially")
-    void testGetElementsIsEmptyInitially(){
+    void testGetElementsIsEmptyInitially() {
         assertTrue(this.result.getElements().isEmpty());
     }
 
     @Test
     @DisplayName("addElements() adds elements correctly")
-    void testAddElements(){
+    void testAddElements() {
         PageElement element = new Heading(1, "test");
         this.result.addElement(element);
         assertEquals(element, this.result.getElements().getFirst());
@@ -48,7 +50,7 @@ public class PageResultTest {
 
     @Test
     @DisplayName("getElements() returns list with correct size")
-    void testGetElementsReturnsListWithCorrectSize(){
+    void testGetElementsReturnsListWithCorrectSize() {
         this.result.addElement(new Heading(1, "test"));
         assertEquals(1, this.result.getElements().size());
 
@@ -58,13 +60,13 @@ public class PageResultTest {
 
     @Test
     @DisplayName("getChildren() should return an empty list initially")
-    void testGetChildrenIsEmptyInitially(){
+    void testGetChildrenIsEmptyInitially() {
 
     }
 
     @Test
     @DisplayName("addChild() adds child PageResult correctly")
-    void testAddChildren(){
+    void testAddChildren() {
         PageResult child = new PageResult(this.testUrl, this.testDepth);
         this.result.addChild(child);
         assertEquals(child, this.result.getChildren().getFirst());
@@ -76,7 +78,7 @@ public class PageResultTest {
 
     @Test
     @DisplayName("getChildren() returns list with correct size")
-    void testGetChildrenReturnsListWithCorrectSize(){
+    void testGetChildrenReturnsListWithCorrectSize() {
         this.result.addChild(new PageResult(this.testUrl, this.testDepth));
         assertEquals(1, this.result.getChildren().size());
 

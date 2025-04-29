@@ -13,13 +13,13 @@ public class CrawlerController {
     private final CrawlerEngine engine;
     private final MarkdownWriter writer;
 
-    public CrawlerController(CrawlerEngine engine, MarkdownWriter writer){
+    public CrawlerController(CrawlerEngine engine, MarkdownWriter writer) {
         this.filename = "crawler_report.md";
         this.engine = engine;
         this.writer = writer;
     }
 
-    public void run(String url, int depth, List<String> allowedDomains){
+    public void run(String url, int depth, List<String> allowedDomains) {
         Logger.info("Crawler started");
         LinkUtils.setAllowedDomains(allowedDomains);
         PageResult result = engine.crawl(url, depth);

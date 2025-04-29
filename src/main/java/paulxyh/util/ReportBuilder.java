@@ -12,7 +12,7 @@ public class ReportBuilder {
     }
 
     public String buildHeadingText(Heading heading, int depth) {
-        return addHeadingPrefix(heading.level(), depth-1) + heading.title() + "\n";
+        return addHeadingPrefix(heading.level(), depth - 1) + heading.title() + "\n";
     }
 
     public String buildLinkText(String link, int depth) {

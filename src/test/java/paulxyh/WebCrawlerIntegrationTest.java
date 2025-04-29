@@ -5,7 +5,13 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import paulxyh.controller.CrawlerController;
 import paulxyh.core.CrawlerEngine;
+import paulxyh.util.fetcher.HTMLContentFetcher;
+import paulxyh.util.fetcher.HTMLContentFetcherImpl;
+import paulxyh.util.fetcher.JsoupWrapper;
+import paulxyh.util.fetcher.JsoupWrapperImpl;
+import paulxyh.util.parser.HTMLParser;
 import paulxyh.util.parser.HTMLParserImpl;
+import paulxyh.util.writer.MarkdownWriter;
 import paulxyh.util.writer.MarkdownWriterImpl;
 
 import java.io.IOException;
@@ -23,6 +29,7 @@ import static org.mockito.Mockito.verify;
 public class WebCrawlerIntegrationTest {
     private static final Path OUTPUT_PATH = Paths.get("crawler_report.md");
     private static final Path EXPECTED_CONTENT_PATH = Paths.get("src/test/resources/expected_output.md");
+
     @BeforeEach
     void cleanOutput() throws IOException {
         Files.deleteIfExists(OUTPUT_PATH);
@@ -35,8 +42,13 @@ public class WebCrawlerIntegrationTest {
         String startUrl = uri.toString();
         List<String> allowedDomains = List.of("file:/");
 
-        CrawlerController controller = new CrawlerController(new CrawlerEngine(new HTMLParserImpl()), new MarkdownWriterImpl());
-        controller.run(startUrl, 3, allowedDomains);
+        HTMLParser parser = new HTMLParserImpl();
+        JsoupWrapper wrapper = new JsoupWrapperImpl();
+        HTMLContentFetcher fetcher = new HTMLContentFetcherImpl(wrapper);
+        CrawlerEngine engine = new CrawlerEngine(parser, fetcher);
+        MarkdownWriter writer = new MarkdownWriterImpl();
+        CrawlerController crawler = new CrawlerController(engine, writer);
+        crawler.run(startUrl, 3, allowedDomains);
 
         assertTrue(Files.exists(OUTPUT_PATH), "Report file should be generated.");
 

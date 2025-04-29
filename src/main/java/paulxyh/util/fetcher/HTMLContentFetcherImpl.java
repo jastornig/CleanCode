@@ -9,20 +9,25 @@ import java.io.IOException;
 import java.net.URI;
 
 public class HTMLContentFetcherImpl implements HTMLContentFetcher {
+    private final JsoupWrapper wrapper;
+    private final String CHARSET = "UTF-8";
+
+    public HTMLContentFetcherImpl(JsoupWrapper wrapper) {
+        this.wrapper = wrapper;
+    }
+
     @Override
     public Document fetch(String url) {
         try {
-            if(url.startsWith("file:")){
+            if (url.startsWith("file:")) {
                 Logger.info("Fetching from local file: " + url);
                 File file = new File(URI.create(url));
-                return Jsoup.parse(file, "UTF-8", url);
-            }
-            else if(url.startsWith("https://") || url.startsWith("http://")) {
-                return Jsoup.connect(url).get();
+                return wrapper.parse(file, CHARSET, url);
+            } else if (url.startsWith("https://") || url.startsWith("http://")) {
+                return wrapper.connect(url);
             }
             return null;
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             Logger.error("Error while fetching HTML content: " + e.getMessage());
             return null;
         }

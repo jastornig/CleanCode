@@ -10,44 +10,26 @@ public class Logger {
 
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
+    private static String getLogLevelColor(Levels logLevel) {
+        return switch (logLevel) {
+            case INFO -> LoggerConstants.LIGHT_BLUE;
+            case WARNING -> LoggerConstants.YELLOW;
+            case ERROR -> LoggerConstants.RED;
+        };
+    }
+
     private static void log(String message, Levels logLevel) {
         String timestamp = LocalDateTime.now().format(formatter);
-        String output = "";
-
-        switch (logLevel) {
-            case INFO:
-                output = String.format(
-                        "[%s] [%s%s%s] %s",
-                        timestamp,
-                        LoggerConstants.LIGHT_BLUE,
-                        "INFO",
-                        LoggerConstants.RESET,
-                        message
-                );
-                break;
-            case WARNING:
-                output = String.format(
-                        "[%s] [%s%s%s] %s",
-                        timestamp,
-                        LoggerConstants.YELLOW,
-                        "WARNING",
-                        LoggerConstants.RESET,
-                        message
-                );
-                break;
-            case ERROR:
-                output = String.format(
-                        "[%s] [%s%s%s] %s",
-                        timestamp,
-                        LoggerConstants.RED,
-                        "ERROR",
-                        LoggerConstants.RESET,
-                        message
-                );
-                break;
-            default:
-                break;
-        }
+        String color = getLogLevelColor(logLevel);
+        String level = logLevel.name();
+        String output = String.format(
+                "[%s] [%s%s%s] %s",
+                timestamp,
+                color,
+                level,
+                LoggerConstants.RESET,
+                message
+        );
         System.out.println(output);
     }
 
@@ -55,11 +37,11 @@ public class Logger {
         log(message, Levels.INFO);
     }
 
-    public static void warn(String message){
+    public static void warn(String message) {
         log(message, Levels.WARNING);
     }
 
-    public static void error(String message){
+    public static void error(String message) {
         log(message, Levels.ERROR);
     }
 }

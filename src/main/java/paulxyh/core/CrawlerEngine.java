@@ -6,24 +6,24 @@ import paulxyh.model.Link;
 import paulxyh.model.PageElement;
 import paulxyh.model.PageResult;
 import paulxyh.util.fetcher.HTMLContentFetcher;
-import paulxyh.util.fetcher.HTMLContentFetcherImpl;
 import paulxyh.util.logger.Logger;
 import paulxyh.util.parser.HTMLParser;
 
 import java.util.*;
 
 public class CrawlerEngine {
+    private final int INITIAL_DEPTH = 1;
     private final HTMLParser parser;
     private final HTMLContentFetcher fetcher;
     private final Set<String> visitedUrls = new HashSet<>();
 
-    public CrawlerEngine(HTMLParser parser) {
+    public CrawlerEngine(HTMLParser parser, HTMLContentFetcher fetcher) {
         this.parser = parser;
-        this.fetcher = new HTMLContentFetcherImpl();
+        this.fetcher = fetcher;
     }
 
     public PageResult crawl(String url, int maxDepth) {
-        return crawlRecursive(url, 1, maxDepth);
+        return crawlRecursive(url, INITIAL_DEPTH, maxDepth);
     }
 
     private PageResult crawlRecursive(String url, int currentDepth, int maxDepth) {
@@ -31,7 +31,7 @@ public class CrawlerEngine {
             Logger.warn("Maximal Depth was reached! Stepping over!");
             return null;
         }
-        if(visitedUrls.contains(url)){
+        if (visitedUrls.contains(url)) {
             Logger.warn("URL " + url + " already visited! Stepping over!");
             return null;
         }
@@ -51,13 +51,7 @@ public class CrawlerEngine {
             for (PageElement element : elements) {
                 result.addElement(element);
                 if (element instanceof Link link && !visitedUrls.contains(link.url())) {
-                    String linkUrl = link.url();
-                    if (link.isValid() && currentDepth < maxDepth) {
-                            PageResult child = crawlRecursive(linkUrl, currentDepth + 1, maxDepth);
-                            if (child != null) {
-                                result.addChild(child);
-                            }
-                    }
+                    crawlLink(result, link, currentDepth, maxDepth);
                 }
             }
         } catch (ElementNotRecognizedException e) {
@@ -65,5 +59,16 @@ public class CrawlerEngine {
         }
 
         return result;
+    }
+
+    private void crawlLink(PageResult parent, Link link, int currentDepth, int maxDepth) {
+        if (!link.isValid() ||
+                currentDepth >= maxDepth) {
+            return;
+        }
+        PageResult child = crawlRecursive(link.url(), currentDepth + 1, maxDepth);
+        if (child != null) {
+            parent.addChild(child);
+        }
     }
 }
