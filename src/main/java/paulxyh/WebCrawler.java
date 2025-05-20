@@ -1,7 +1,9 @@
 package paulxyh;
 
+import paulxyh.args.ArgParser;
 import paulxyh.controller.CrawlerController;
 import paulxyh.core.CrawlerEngine;
+import paulxyh.exception.ArgParsingException;
 import paulxyh.exception.IncorrectInputException;
 import paulxyh.util.LinkUtils;
 import paulxyh.util.fetcher.HTMLContentFetcher;
@@ -20,19 +22,30 @@ import java.util.List;
 public class WebCrawler {
     public static void main(String[] args) {
 
-        Logger.setLogLevel(Logger.Level.DEBUG);
+        ArgParser argParser = new ArgParser();
+        argParser.addArgument("url", "The starting URL for the crawler", true);
+        argParser.addArgument("depth", "The maximum depth to crawl", true);
+        argParser.addArgument("verbose", "If additional information should be logged", false);
+        argParser.addTrailingArgs("domain","The domains to crawl", true);
 
-        if (args.length < 3) {
-            Logger.error("Usage: java WebCrawler <startURL> <depth> <domains>");
+        try {
+            argParser.parse(args);
+        } catch (ArgParsingException e) {
+            System.err.println(e.getMessage());
+            System.out.println(argParser.getSynopsis());
             System.exit(1);
         }
 
-        String startUrl = args[0];
+        if(argParser.has("verbose")){
+            Logger.setLogLevel(Logger.Level.DEBUG);
+        }
+
+        String startUrl = argParser.get("url");
         int maxDepth;
 
         try {
             LinkUtils.checkUrlFormatting(startUrl);
-            maxDepth = Integer.parseInt(args[1]);
+            maxDepth = Integer.parseInt(argParser.get("depth"));
         } catch (IncorrectInputException i) {
             Logger.error("Input URL must contain 'https://' or 'http://'!");
             return;
@@ -41,7 +54,7 @@ public class WebCrawler {
             return;
         }
 
-        List<String> allowedDomains = Arrays.asList(args[2].split(","));
+        List<String> allowedDomains = argParser.getTrailingArgs();
 
         Logger.info("Initializing Crawler with url: " + startUrl);
         HTMLParser parser = new HTMLParserImpl();
