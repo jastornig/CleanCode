@@ -27,13 +27,13 @@ public class LinkUtils {
 
     public static boolean isLinkValid(String link) {
         try {
-            Logger.info("Checking link: " + link);
+            Logger.debug("Checking link: " + link);
             if (isLinkAlreadyChecked(link)) {
                 Logger.warn("Link was already checked! Stepping over!");
                 return checkedUrls.get(link);
             }
             if (isHttpScheme(link)) {
-                Logger.info("Http Scheme");
+                Logger.debug(link + " has Http Scheme");
                 return checkHttpScheme(link);
             }
             if (isSpecialScheme(link)) {
@@ -42,7 +42,7 @@ public class LinkUtils {
                 return true;
             }
             if (isFileScheme(link)) {
-                Logger.info("File Scheme");
+                Logger.debug("File Scheme");
                 return checkFileScheme(link);
             }
             Logger.info("Link not valid: " + link);
@@ -94,17 +94,25 @@ public class LinkUtils {
     }
 
     private static boolean checkReachable(URL url) throws IOException {
-        Logger.info("Checking Reachability of url!");
         HttpURLConnection httpURLConnection = urlConnectionWrapper.openConnection(url);
         httpURLConnection.setRequestMethod("HEAD");
-        return httpURLConnection.getResponseCode() == HttpURLConnection.HTTP_OK;
+        if(httpURLConnection.getResponseCode() == HttpURLConnection.HTTP_OK){
+            Logger.debug(url + " is reachable");
+            return true;
+        }else{
+            Logger.debug(url + " is not reachable");
+            return false;
+        }
     }
 
     private static boolean checkDomain(String host) {
-        Logger.info("Checking if domain is allowed!");
         for (String domain : allowedDomains) {
-            if (host.contains(domain)) return true;
+            if (host.contains(domain)){
+                Logger.debug("Domain " + host  + " is allowed");
+                return true;
+            }
         }
+        Logger.debug("Domain " + host  + " is not allowed");
         return false;
     }
 

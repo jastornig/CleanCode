@@ -19,6 +19,9 @@ import java.util.List;
 
 public class WebCrawler {
     public static void main(String[] args) {
+
+        Logger.setLogLevel(Logger.Level.DEBUG);
+
         if (args.length < 3) {
             Logger.error("Usage: java WebCrawler <startURL> <depth> <domains>");
             System.exit(1);

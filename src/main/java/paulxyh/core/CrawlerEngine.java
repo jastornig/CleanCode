@@ -37,7 +37,7 @@ public class CrawlerEngine {
         }
         visitedUrls.add(url);
 
-        Logger.info("Fetching HTML content");
+        Logger.info("Fetching HTML content for URL: " + url);
         Document htmlContent = fetcher.fetch(url);
         if (htmlContent == null) {
             Logger.warn("No HTML Content fetched! Exiting...");
