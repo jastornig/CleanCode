@@ -25,6 +25,7 @@ public class WebCrawler {
         ArgParser argParser = new ArgParser();
         argParser.addArgument("url", "The starting URL for the crawler", true);
         argParser.addArgument("depth", "The maximum depth to crawl", true);
+        argParser.addArgument("threads", "The number of threads to use. Default is 3", false);
         argParser.addArgument("verbose", "If additional information should be logged", false);
         argParser.addTrailingArgs("domain","The domains to crawl", true);
 
@@ -39,10 +40,18 @@ public class WebCrawler {
         if(argParser.has("verbose")){
             Logger.setLogLevel(Logger.Level.DEBUG);
         }
+        int numThreads = 3;
+        if(argParser.has("threads")){
+            try {
+                numThreads = Integer.parseInt(argParser.get("threads"));
+            } catch (NumberFormatException e) {
+                Logger.error("Number of threads must be an integer.");
+                return;
+            }
+        }
 
         String startUrl = argParser.get("url");
         int maxDepth;
-
         try {
             LinkUtils.checkUrlFormatting(startUrl);
             maxDepth = Integer.parseInt(argParser.get("depth"));
@@ -56,15 +65,14 @@ public class WebCrawler {
 
         List<String> allowedDomains = argParser.getTrailingArgs();
 
-        Logger.info("Initializing Crawler with url: " + startUrl);
-        HTMLParser parser = new HTMLParserImpl();
+        Logger.info("Initializing Crawler with url: " + startUrl + " and " + numThreads + " threads");
         JsoupWrapper wrapper = new JsoupWrapperImpl();
         HTMLContentFetcher fetcher = new HTMLContentFetcherImpl(wrapper);
-        CrawlerEngine engine = new CrawlerEngine(parser, fetcher);
+        CrawlerEngine engine = new CrawlerEngine(fetcher, numThreads, maxDepth);
         MarkdownWriter writer = new MarkdownWriterImpl();
         CrawlerController crawler = new CrawlerController(engine, writer);
 
         Logger.info("Starting Crawler");
-        crawler.run(startUrl, maxDepth, allowedDomains);
+        crawler.run(startUrl, allowedDomains);
     }
 }

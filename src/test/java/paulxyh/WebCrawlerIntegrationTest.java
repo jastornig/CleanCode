@@ -45,10 +45,10 @@ public class WebCrawlerIntegrationTest {
         HTMLParser parser = new HTMLParserImpl();
         JsoupWrapper wrapper = new JsoupWrapperImpl();
         HTMLContentFetcher fetcher = new HTMLContentFetcherImpl(wrapper);
-        CrawlerEngine engine = new CrawlerEngine(parser, fetcher);
+        CrawlerEngine engine = new CrawlerEngine(parser, fetcher, 1, 3);
         MarkdownWriter writer = new MarkdownWriterImpl();
         CrawlerController crawler = new CrawlerController(engine, writer);
-        crawler.run(startUrl, 3, allowedDomains);
+        crawler.run(startUrl, allowedDomains);
 
         assertTrue(Files.exists(OUTPUT_PATH), "Report file should be generated.");
 

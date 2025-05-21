@@ -13,6 +13,8 @@ import paulxyh.util.logger.Logger;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 public class MarkdownWriterImpl implements MarkdownWriter {
     private BufferedWriter writer;
@@ -45,38 +47,41 @@ public class MarkdownWriterImpl implements MarkdownWriter {
 
     private void writeRecursively(PageResult page, int depth) throws WriterNotInitializedException {
         if (!checkWriterExists()) throw new WriterNotInitializedException();
-        int childIndex = 0;
         try {
             if (depth == 1) {
                 writeInitialDetails(page);
             }
+            writeStartOfPage(page.getUrl());
+            Set<String> handledLinks = new HashSet<>();
             for (PageElement element : page.getElements()) {
                 if (element instanceof Heading heading) writeHeading(heading, depth);
                 else if (element instanceof Link link) {
-                    childIndex = handleLink(page, depth, link, childIndex);
+                     boolean recursive = !handledLinks.contains(link.url());
+                     handledLinks.add(link.url());
+                     handleLink(page, depth, link, recursive);
                 }
             }
+            writeEndOfPage(page.getUrl());
         } catch (WriteExecutionException e) {
             Logger.error("Error while writing the report: " + e.getMessage());
         }
     }
 
-    private int handleLink(PageResult page, int depth, Link link, int childIndex) throws WriteExecutionException, WriterNotInitializedException {
+    private void handleLink(PageResult page, int depth, Link link, boolean recursive) throws WriteExecutionException, WriterNotInitializedException {
         if (link.isValid()) {
-            childIndex = handleValidLink(page, depth, link, childIndex);
+            handleValidLink(page, depth, link, recursive);
         } else {
             writeBrokenLink(link.url(), depth);
         }
-        return childIndex;
     }
 
-    private int handleValidLink(PageResult page, int depth, Link link, int childIndex) throws WriteExecutionException, WriterNotInitializedException {
+    private void handleValidLink(PageResult page, int depth, Link link, boolean recursive) throws WriteExecutionException, WriterNotInitializedException {
         writeLink(link.url(), depth);
         writeDepth(depth + 1);
-        if (!page.getChildren().isEmpty() && childIndex < page.getChildren().size()) {
-            writeRecursively(page.getChildren().get(childIndex++), depth + 1);
+        PageResult child = page.getChildByUrl(link.url());
+        if(child != null && recursive){
+            writeRecursively(child, depth + 1);
         }
-        return childIndex;
     }
 
     private void writeInitialDetails(PageResult page) throws WriteExecutionException {
@@ -100,6 +105,24 @@ public class MarkdownWriterImpl implements MarkdownWriter {
     private void writeDepth(int depth) throws WriteExecutionException {
         try {
             String text = this.builder.buildDepthText(depth);
+            this.writer.write(text);
+        } catch (IOException e) {
+            throw new WriteExecutionException();
+        }
+    }
+
+    private void writeStartOfPage(String url) throws WriteExecutionException {
+        try {
+            String text = this.builder.buildStartOfPageText(url);
+            this.writer.write(text);
+        } catch (IOException e) {
+            throw new WriteExecutionException();
+        }
+    }
+
+    private void writeEndOfPage(String url) throws WriteExecutionException {
+        try {
+            String text = this.builder.buildEndOfPageText(url);
             this.writer.write(text);
         } catch (IOException e) {
             throw new WriteExecutionException();

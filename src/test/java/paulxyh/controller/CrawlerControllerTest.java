@@ -35,11 +35,11 @@ public class CrawlerControllerTest {
     @DisplayName("Verify engine.start() and writer.write() are called")
     void testRunCallsEngineAndWriter(){
         PageResult mockResult = mock(PageResult.class);
-        when(engine.crawl(testUrl, 1)).thenReturn(mockResult);
+        when(engine.crawl(testUrl)).thenReturn(mockResult);
 
-        controller.run(testUrl, 1, List.of("paulxyh", "test", "url"));
+        controller.run(testUrl, List.of("paulxyh", "test", "url"));
 
-        verify(engine).crawl(testUrl, 1);
+        verify(engine).crawl(testUrl);
         verify(writer).write(mockResult, "crawler_report.md");
     }
 }

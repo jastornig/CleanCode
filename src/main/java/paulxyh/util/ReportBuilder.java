@@ -23,6 +23,14 @@ public class ReportBuilder {
         return addLinkPrefix(depth) + "broken link <a>" + brokenLink + "</a>\n";
     }
 
+    public String buildStartOfPageText(String url) {
+        return "<br>-----start of page <a>" + url + "</a>\n";
+    }
+
+    public String buildEndOfPageText(String url) {
+        return "<br>-----end of page <a>" + url + "</a>\n";
+    }
+
     private String addHeadingPrefix(int level, int depth) {
         return "#".repeat(level) + " " + addDepthIntent(depth);
     }

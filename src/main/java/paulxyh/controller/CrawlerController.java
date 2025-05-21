@@ -19,10 +19,10 @@ public class CrawlerController {
         this.writer = writer;
     }
 
-    public void run(String url, int depth, List<String> allowedDomains) {
+    public void run(String url, List<String> allowedDomains) {
         Logger.info("Crawler started");
         LinkUtils.setAllowedDomains(allowedDomains);
-        PageResult result = engine.crawl(url, depth);
+        PageResult result = engine.crawl(url);
 
         Logger.info("Writing results to " + filename);
         writer.write(result, filename);

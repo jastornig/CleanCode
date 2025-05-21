@@ -10,10 +10,11 @@ import paulxyh.model.PageElement;
 import paulxyh.util.LinkUtils;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class HTMLParserImpl implements HTMLParser {
     private List<PageElement> htmlElements;
-    private final Map<String, Boolean> checkedUrls = new HashMap<>();
+    private static final Map<String, Boolean> checkedUrls = new ConcurrentHashMap<>();
 
     @Override
     public List<PageElement> parse(String url, Document content) throws ElementNotRecognizedException {
@@ -45,9 +46,10 @@ public class HTMLParserImpl implements HTMLParser {
     }
 
     private void parseLink(Element element) {
-        String link = element.absUrl("href");
-        boolean isLinkValid = getIsLinkValid(link);
-        htmlElements.add(new Link(link, isLinkValid));
+        String unnormalizedLink = element.absUrl("href");
+        String normalizedLink = LinkUtils.normalizeLinkAndRemoveFragment(unnormalizedLink);
+        boolean isLinkValid = getIsLinkValid(normalizedLink);
+        htmlElements.add(new Link(normalizedLink, isLinkValid));
     }
 
     private boolean getIsLinkValid(String link) {

@@ -8,6 +8,7 @@ import paulxyh.util.url.URLConnectionWrapperImpl;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -23,6 +24,18 @@ public class LinkUtils {
 
     public static void setAllowedDomains(List<String> domains) {
         allowedDomains = domains;
+    }
+
+    public static String normalizeLinkAndRemoveFragment(String url) {
+        URI uri = URI.create(url);
+        try {
+            String schemeSpecificPart = uri.getSchemeSpecificPart().replaceFirst("^//www.", "//");
+            uri = new URI(uri.getScheme(), schemeSpecificPart, null);
+        }catch (URISyntaxException e){
+            Logger.warn("Error while normalizing URL. Using unnormalized instead: " + e.getMessage());
+            return url;
+        }
+        return uri.toString();
     }
 
     public static boolean isLinkValid(String link) {
