@@ -13,39 +13,38 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class HTMLParserImpl implements HTMLParser {
-    private List<PageElement> htmlElements;
     private static final Map<String, Boolean> checkedUrls = new ConcurrentHashMap<>();
 
     @Override
     public List<PageElement> parse(String url, Document content) throws ElementNotRecognizedException {
-        htmlElements = new ArrayList<>();
+        List<PageElement> htmlElements = new ArrayList<>();
 
         Elements elements = content.body().select("h1, h2, h3, h4, h5, h6, a[href]");
 
         for (Element element : elements) {
-            parseToCorrectType(element);
+            parseToCorrectType(element, htmlElements);
         }
 
         return htmlElements;
     }
 
-    private void parseToCorrectType(Element element) throws ElementNotRecognizedException {
+    private void parseToCorrectType(Element element, List<PageElement> htmlElements) throws ElementNotRecognizedException {
         if (element.tagName().matches("h[1-6]")) {
-            parseHeading(element);
+            parseHeading(element, htmlElements);
         } else if (element.tagName().equals("a")) {
-            parseLink(element);
+            parseLink(element, htmlElements);
         } else {
             throw new ElementNotRecognizedException();
         }
     }
 
-    private void parseHeading(Element element) {
+    private void parseHeading(Element element, List<PageElement> htmlElements) {
         String tag = element.tagName();
         int level = Integer.parseInt(tag.substring(1));
-        this.htmlElements.add(new Heading(level, element.text()));
+        htmlElements.add(new Heading(level, element.text()));
     }
 
-    private void parseLink(Element element) {
+    private void parseLink(Element element, List<PageElement> htmlElements) {
         String unnormalizedLink = element.absUrl("href");
         String normalizedLink = LinkUtils.normalizeLinkAndRemoveFragment(unnormalizedLink);
         boolean isLinkValid = getIsLinkValid(normalizedLink);

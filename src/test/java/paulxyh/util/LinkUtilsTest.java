@@ -138,4 +138,12 @@ public class LinkUtilsTest {
         String invalidUrl = "ftp://example.com";
         assertThrows(IncorrectInputException.class, () -> LinkUtils.checkUrlFormatting(invalidUrl));
     }
+
+    @Test
+    @DisplayName("normalizeLinkAndRemoveFragment() should return normalized URL without fragment")
+    public void testNormalizeLinkAndRemoveFragment() {
+        String urlWithFragment = "https://paulxyh.test.url#section1";
+        String normalizedUrl = LinkUtils.normalizeLinkAndRemoveFragment(urlWithFragment);
+        assertEquals("https://paulxyh.test.url", normalizedUrl);
+    }
 }

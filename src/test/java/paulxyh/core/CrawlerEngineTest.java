@@ -2,11 +2,9 @@ package paulxyh.core;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import paulxyh.exception.ElementNotRecognizedException;
@@ -18,45 +16,53 @@ import paulxyh.util.parser.HTMLParser;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 @DisplayName("CrawlerEngine Tests")
 @ExtendWith(MockitoExtension.class)
 public class CrawlerEngineTest {
 
-    @InjectMocks
-    private CrawlerEngine engine;
     @Mock
     private HTMLParser parser;
+
     @Mock
     private HTMLContentFetcher fetcher;
 
-    @BeforeEach
-    void setup() {
-        engine = new CrawlerEngine(parser, fetcher);
-    }
 
     @Test
     @DisplayName("crawl() should return empty PageResult for depth 0")
     void testCrawlReturnsEmptyPageResult() {
-        PageResult result = engine.crawl("testUrl", 0);
+        CrawlerEngine engine = new CrawlerEngine(fetcher, parser, new CrawlTaskExecutor(10), 0);
+        PageResult result = engine.crawl("testUrl");
+        assertNull(result);
+    }
+
+    @Test
+    @DisplayName("cawl() should lead to failure, when fetcher returns null")
+    void testCrawlThrowsExceptionWhenFetcherReturnsNull() {
+        CrawlerEngine engine = new CrawlerEngine(fetcher, parser, new CrawlTaskExecutor(10), 1);
+        String url = "https://paulxyh.test.url";
+        when(fetcher.fetch(url)).thenReturn(null);
+        PageResult result = engine.crawl(url);
+        assertTrue(engine.isFailure());
         assertNull(result);
     }
 
     @Test
     @DisplayName("crawl() should return null for url with no content")
     void testCrawlReturnsEmptyPageResultForEmptyWebsite() {
+        CrawlerEngine engine = new CrawlerEngine(fetcher, parser, new CrawlTaskExecutor(10), 1);
         String url = "https://paulxyh.test.url";
         when(fetcher.fetch(url)).thenReturn(null);
-        PageResult result = engine.crawl(url, 1);
+        PageResult result = engine.crawl(url);
         assertNull(result);
     }
 
     @Test
     @DisplayName("crawl() should return correct PageResult for HTML with 1 Heading and 1 Link")
     void testCrawlReturnsCorrectPageResult() throws ElementNotRecognizedException {
+        CrawlerEngine engine = new CrawlerEngine(fetcher, parser, new CrawlTaskExecutor(10), 1);
         String url = "https://paulxyh.test.url";
         String html = """
                 <h1>TestHeading</h1>
@@ -67,7 +73,7 @@ public class CrawlerEngineTest {
         Link mockedLink = new Link(url, true);
         when(fetcher.fetch(url)).thenReturn(mockedDocument);
         when(parser.parse(url, mockedDocument)).thenReturn(List.of(mockedHeading, mockedLink));
-        PageResult result = engine.crawl(url, 1);
+        PageResult result = engine.crawl(url);
         assertEquals(url, result.getUrl());
         assertEquals(1, result.getDepth());
         assertEquals(2, result.getElements().size());
@@ -79,6 +85,7 @@ public class CrawlerEngineTest {
     @Test
     @DisplayName("crawl() should return correct PageResult for depth 2")
     void testCrawlReturnsCorrectPageResultForDepthTwo() throws ElementNotRecognizedException {
+        CrawlerEngine engine = new CrawlerEngine(fetcher, parser, new CrawlTaskExecutor(10), 2);
         String url = "https://paulxyh.test.url";
         String html = """
                 <h1>TestHeading</h1>
@@ -103,7 +110,7 @@ public class CrawlerEngineTest {
         when(fetcher.fetch(urlDeeper)).thenReturn(mockedDocumentDeeper);
         when(parser.parse(urlDeeper, mockedDocumentDeeper)).thenReturn(List.of(mockedHeadingDeeper, mockedLinkDeeper));
 
-        PageResult result = engine.crawl(url, 2);
+        PageResult result = engine.crawl(url);
         assertEquals(url, result.getUrl());
         assertEquals(1, result.getDepth());
         assertEquals(2, result.getElements().size());

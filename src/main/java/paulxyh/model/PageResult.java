@@ -47,6 +47,6 @@ public class PageResult {
     }
 
     public synchronized void addChild(PageResult child) {
-        this.children.put(child.getUrl(), child);
+        this.children.putIfAbsent(child.getUrl(), child);
     }
 }

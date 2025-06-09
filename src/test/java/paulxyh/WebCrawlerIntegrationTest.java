@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import paulxyh.controller.CrawlerController;
+import paulxyh.core.CrawlTaskExecutor;
 import paulxyh.core.CrawlerEngine;
 import paulxyh.util.fetcher.HTMLContentFetcher;
 import paulxyh.util.fetcher.HTMLContentFetcherImpl;
@@ -42,10 +43,11 @@ public class WebCrawlerIntegrationTest {
         String startUrl = uri.toString();
         List<String> allowedDomains = List.of("file:/");
 
-        HTMLParser parser = new HTMLParserImpl();
         JsoupWrapper wrapper = new JsoupWrapperImpl();
         HTMLContentFetcher fetcher = new HTMLContentFetcherImpl(wrapper);
-        CrawlerEngine engine = new CrawlerEngine(parser, fetcher, 1, 3);
+        CrawlTaskExecutor executor = new CrawlTaskExecutor(10);
+        HTMLParser parser = new HTMLParserImpl();
+        CrawlerEngine engine = new CrawlerEngine(fetcher, parser, executor, 3);
         MarkdownWriter writer = new MarkdownWriterImpl();
         CrawlerController crawler = new CrawlerController(engine, writer);
         crawler.run(startUrl, allowedDomains);

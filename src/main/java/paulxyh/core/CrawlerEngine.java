@@ -8,12 +8,9 @@ import paulxyh.model.PageResult;
 import paulxyh.util.fetcher.HTMLContentFetcher;
 import paulxyh.util.logger.Logger;
 import paulxyh.util.parser.HTMLParser;
-import paulxyh.util.parser.HTMLParserImpl;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public class CrawlerEngine {
     private final HTMLContentFetcher fetcher;
@@ -21,15 +18,23 @@ public class CrawlerEngine {
     private final CrawlTaskExecutor crawlTaskExecutor;
     private final int maxDepth;
     private PageResult finalResult;
+    private final HTMLParser htmlParser;
+    private boolean crawlingFailed = false;
 
-    public CrawlerEngine(HTMLContentFetcher fetcher, int numThreads, int maxDepth) {
+    public CrawlerEngine(HTMLContentFetcher fetcher, HTMLParser parser, CrawlTaskExecutor executor, int maxDepth) {
         this.fetcher = fetcher;
         this.maxDepth = maxDepth;
-        this.crawlTaskExecutor = new CrawlTaskExecutor(numThreads);
+        this.crawlTaskExecutor = executor;
+        this.htmlParser = parser;
     }
 
+    public boolean isFailure(){
+        return crawlingFailed;
+    }
 
     public PageResult crawl(String url) {
+        if(maxDepth == 0)
+            return null;
         submitTask(() -> processInitialPage(url));
         crawlTaskExecutor.waitForAllTasksToFinish();
         crawlTaskExecutor.shutdown();
@@ -60,7 +65,7 @@ public class CrawlerEngine {
         this.finalResult = initialPage;
         if(initialPage == null){
             Logger.error("Initial page could not be crawled!");
-            System.exit(1);
+            crawlingFailed = true;
             return;
         }
         List<Link> links = initialPage.getLinks();
@@ -97,8 +102,7 @@ public class CrawlerEngine {
         }
         PageResult result = new PageResult(url, currentDepth);
         try {
-            HTMLParser parser = new HTMLParserImpl();
-            List<PageElement> elements = parser.parse(url, htmlContent);
+            List<PageElement> elements = htmlParser.parse(url, htmlContent);
             for (PageElement element : elements) {
                 result.addElement(element);
             }

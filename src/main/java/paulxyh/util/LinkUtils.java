@@ -30,6 +30,7 @@ public class LinkUtils {
         URI uri = URI.create(url);
         try {
             String schemeSpecificPart = uri.getSchemeSpecificPart().replaceFirst("^//www.", "//");
+            //String schemeSpecificPart = uri.getSchemeSpecificPart();
             uri = new URI(uri.getScheme(), schemeSpecificPart, null);
         }catch (URISyntaxException e){
             Logger.warn("Error while normalizing URL. Using unnormalized instead: " + e.getMessage());
@@ -109,7 +110,8 @@ public class LinkUtils {
     private static boolean checkReachable(URL url) throws IOException {
         HttpURLConnection httpURLConnection = urlConnectionWrapper.openConnection(url);
         httpURLConnection.setRequestMethod("HEAD");
-        if(httpURLConnection.getResponseCode() == HttpURLConnection.HTTP_OK){
+        int responseCode = httpURLConnection.getResponseCode();
+        if(responseCode == HttpURLConnection.HTTP_OK){
             Logger.debug(url + " is reachable");
             return true;
         }else{

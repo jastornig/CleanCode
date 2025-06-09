@@ -7,9 +7,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class CrawlTaskExecutor {
-    private ExecutorService executorService;
-    private AtomicInteger runningTasks = new AtomicInteger(0);
-
+    private final ExecutorService executorService;
+    private final AtomicInteger runningTasks = new AtomicInteger(0);
     public CrawlTaskExecutor(int numThreads){
         this.executorService = Executors.newFixedThreadPool(numThreads);
     }

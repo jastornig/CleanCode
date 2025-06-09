@@ -50,6 +50,18 @@ public class LoggerTest {
     }
 
     @Test
+    @DisplayName("Logger.debug() should have correct formatting")
+    void testLogDebugHasCorrectFormatting() {
+        Logger.setLogLevel(Logger.Level.DEBUG); // Ensure debug level is enabled
+        Logger.debug("This is a message on log level debug");
+
+        String out = captureLogs.toString().trim();
+        assertTrue(out.contains("DEBUG"));
+        assertTrue(out.contains(LoggerConstants.GRAY));
+        assertTrue(out.contains("This is a message on log level debug"));
+    }
+
+    @Test
     @DisplayName("Logger.error() should have correct formatting")
     void testLogErrorHasCorrectFormatting() {
         Logger.error("This is a message on log level error");
@@ -63,11 +75,13 @@ public class LoggerTest {
     @Test
     @DisplayName("getLogLevelColor() should return correct color code")
     void testGetLogLevelColorReturnsCorrectColorCode() throws IOException {
+        Logger.setLogLevel(Logger.Level.DEBUG);
         Logger.info("Should return LIGHT_BLUE");
         String out = captureLogs.toString().trim();
         assertTrue(out.contains(LoggerConstants.LIGHT_BLUE));
         assertFalse(out.contains(LoggerConstants.YELLOW));
         assertFalse(out.contains(LoggerConstants.RED));
+        assertFalse(out.contains(LoggerConstants.GRAY));
         captureLogs.reset();
 
         Logger.warn("Should return YELLOW");
@@ -75,6 +89,7 @@ public class LoggerTest {
         assertFalse(out.contains(LoggerConstants.LIGHT_BLUE));
         assertTrue(out.contains(LoggerConstants.YELLOW));
         assertFalse(out.contains(LoggerConstants.RED));
+        assertFalse(out.contains(LoggerConstants.GRAY));
         captureLogs.reset();
         
         Logger.error("Should return RED");
@@ -82,6 +97,27 @@ public class LoggerTest {
         assertFalse(out.contains(LoggerConstants.LIGHT_BLUE));
         assertFalse(out.contains(LoggerConstants.YELLOW));
         assertTrue(out.contains(LoggerConstants.RED));
+        assertFalse(out.contains(LoggerConstants.GRAY));
+        captureLogs.reset();
+
+        Logger.debug("Should return GRAY");
+        out = captureLogs.toString().trim();
+        assertFalse(out.contains(LoggerConstants.LIGHT_BLUE));
+        assertFalse(out.contains(LoggerConstants.YELLOW));
+        assertFalse(out.contains(LoggerConstants.RED));
+        assertTrue(out.contains(LoggerConstants.GRAY));
+    }
+    @Test
+    @DisplayName("Debug messages should not be logged when log level is set to INFO")
+    void testLogLevel() {
+        Logger.setLogLevel(Logger.Level.INFO);
+        Logger.debug("This debug message should not be logged");
+        String out = captureLogs.toString().trim();
+        assertFalse(out.contains("DEBUG"));
+
+        Logger.info("This info message should be logged");
+        out = captureLogs.toString().trim();
+        assertTrue(out.contains("INFO"));
     }
 
     @Test

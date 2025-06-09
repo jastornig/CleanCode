@@ -23,8 +23,11 @@ public class CrawlerController {
         Logger.info("Crawler started");
         LinkUtils.setAllowedDomains(allowedDomains);
         PageResult result = engine.crawl(url);
-
-        Logger.info("Writing results to " + filename);
-        writer.write(result, filename);
+        if(engine.isFailure()){
+            Logger.error("Crawling failed");
+        }else {
+            Logger.info("Writing results to " + filename);
+            writer.write(result, filename);
+        }
     }
 }

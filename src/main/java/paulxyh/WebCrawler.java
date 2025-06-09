@@ -2,6 +2,7 @@ package paulxyh;
 
 import paulxyh.args.ArgParser;
 import paulxyh.controller.CrawlerController;
+import paulxyh.core.CrawlTaskExecutor;
 import paulxyh.core.CrawlerEngine;
 import paulxyh.exception.ArgParsingException;
 import paulxyh.exception.IncorrectInputException;
@@ -16,7 +17,7 @@ import paulxyh.util.parser.HTMLParserImpl;
 import paulxyh.util.writer.MarkdownWriter;
 import paulxyh.util.writer.MarkdownWriterImpl;
 
-import java.util.Arrays;
+import java.net.HttpURLConnection;
 import java.util.List;
 
 public class WebCrawler {
@@ -64,11 +65,13 @@ public class WebCrawler {
         }
 
         List<String> allowedDomains = argParser.getTrailingArgs();
-
+        HttpURLConnection.setFollowRedirects(true);
         Logger.info("Initializing Crawler with url: " + startUrl + " and " + numThreads + " threads");
         JsoupWrapper wrapper = new JsoupWrapperImpl();
         HTMLContentFetcher fetcher = new HTMLContentFetcherImpl(wrapper);
-        CrawlerEngine engine = new CrawlerEngine(fetcher, numThreads, maxDepth);
+        CrawlTaskExecutor executor = new CrawlTaskExecutor(numThreads);
+        HTMLParser parser = new HTMLParserImpl();
+        CrawlerEngine engine = new CrawlerEngine(fetcher, parser, executor, maxDepth);
         MarkdownWriter writer = new MarkdownWriterImpl();
         CrawlerController crawler = new CrawlerController(engine, writer);
 

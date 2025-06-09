@@ -56,6 +56,7 @@ public class HTMLParserImplTest {
 
         try (MockedStatic<LinkUtils> utilities = mockStatic(LinkUtils.class)) {
             utilities.when(() -> LinkUtils.isLinkValid(validUrl)).thenReturn(true);
+            utilities.when(() -> LinkUtils.normalizeLinkAndRemoveFragment(validUrl)).thenReturn(validUrl);
             List<PageElement> result = parser.parse(parseUrl, document);
             assertEquals(1, result.size());
             assertInstanceOf(Link.class, result.getFirst());
@@ -76,6 +77,7 @@ public class HTMLParserImplTest {
 
         try (MockedStatic<LinkUtils> utilities = mockStatic(LinkUtils.class)) {
             utilities.when(() -> LinkUtils.isLinkValid(brokenUrl)).thenReturn(false);
+            utilities.when(() -> LinkUtils.normalizeLinkAndRemoveFragment(brokenUrl)).thenReturn(brokenUrl);
             List<PageElement> result = parser.parse(parseUrl, document);
             assertEquals(1, result.size());
             assertInstanceOf(Link.class, result.getFirst());
@@ -99,6 +101,7 @@ public class HTMLParserImplTest {
 
         try (MockedStatic<LinkUtils> utilities = mockStatic(LinkUtils.class)) {
             utilities.when(() -> LinkUtils.isLinkValid(url)).thenReturn(true);
+            utilities.when(() -> LinkUtils.normalizeLinkAndRemoveFragment(url)).thenReturn(url);
             parser.parse(parseUrl, document);
             utilities.verify(() -> LinkUtils.isLinkValid(url), times(1));
         }
