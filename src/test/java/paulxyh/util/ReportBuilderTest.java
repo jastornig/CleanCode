@@ -61,18 +61,7 @@ public class ReportBuilderTest {
     @Test
     @DisplayName("addDepthIntent() should return empty string for depth 0")
     void addDepthIntentReturnsEmptyForZeroDepth() {
-        String result = invokeAddDepthIntent(0);
+        String result = builder.addDepthIntent(0);
         assertEquals("", result);
-    }
-
-    // see Visibility and Testing Disclaimer in README
-    private String invokeAddDepthIntent(int depth) {
-        try {
-            var method = ReportBuilder.class.getDeclaredMethod("addDepthIntent", int.class);
-            method.setAccessible(true);
-            return (String) method.invoke(builder, depth);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
     }
 }

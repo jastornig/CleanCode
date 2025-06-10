@@ -5,6 +5,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import paulxyh.exception.WriterNotInitializedException;
 import paulxyh.model.Heading;
 import paulxyh.model.Link;
 import paulxyh.model.PageResult;
@@ -73,13 +74,13 @@ public class MarkdownWriterImplTest {
 
     @Test
     @DisplayName("writeRecursively() should skip writing initial details on depth 2")
-    void testWriteRecursivelySkipsInitialDetailsOnDepthTwo() {
+    void testWriteRecursivelySkipsInitialDetailsOnDepthTwo() throws WriterNotInitializedException {
         Link link = new Link("http://test.url", true);
         PageResult result = new PageResult("http://paulxyh.test.url", 2);
         result.addElement(link);
         when(builder.buildLinkText("http://test.url", 2)).thenReturn("");
         when(builder.buildDepthText(anyInt())).thenReturn("");
-        invokeWriteRecursively(result, 2);
+        writer.writeRecursively(result, 2);
         verify(builder, times(0)).buildInputUrlText(anyString());
         verify(builder, times(1)).buildDepthText(anyInt());
     }
@@ -87,16 +88,5 @@ public class MarkdownWriterImplTest {
     private void mockInitialReportMethods() {
         when(builder.buildInputUrlText(anyString())).thenReturn("");
         when(builder.buildDepthText(anyInt())).thenReturn("");
-    }
-
-    // see Visibility and Testing Disclaimer in README
-    private String invokeWriteRecursively(PageResult result, int depth) {
-        try {
-            var method = MarkdownWriterImpl.class.getDeclaredMethod("writeRecursively", PageResult.class, int.class);
-            method.setAccessible(true);
-            return (String) method.invoke(writer, result, depth);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
     }
 }

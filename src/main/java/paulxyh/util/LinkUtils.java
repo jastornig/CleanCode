@@ -32,7 +32,7 @@ public class LinkUtils {
             String schemeSpecificPart = uri.getSchemeSpecificPart().replaceFirst("^//www.", "//");
             //String schemeSpecificPart = uri.getSchemeSpecificPart();
             uri = new URI(uri.getScheme(), schemeSpecificPart, null);
-        }catch (URISyntaxException e){
+        } catch (URISyntaxException e) {
             Logger.warn("Error while normalizing URL. Using unnormalized instead: " + e.getMessage());
             return url;
         }
@@ -111,10 +111,10 @@ public class LinkUtils {
         HttpURLConnection httpURLConnection = urlConnectionWrapper.openConnection(url);
         httpURLConnection.setRequestMethod("HEAD");
         int responseCode = httpURLConnection.getResponseCode();
-        if(responseCode == HttpURLConnection.HTTP_OK){
+        if (responseCode == HttpURLConnection.HTTP_OK) {
             Logger.debug(url + " is reachable");
             return true;
-        }else{
+        } else {
             Logger.debug(url + " is not reachable");
             return false;
         }
@@ -122,12 +122,12 @@ public class LinkUtils {
 
     private static boolean checkDomain(String host) {
         for (String domain : allowedDomains) {
-            if (host.contains(domain)){
-                Logger.debug("Domain " + host  + " is allowed");
+            if (host.contains(domain)) {
+                Logger.debug("Domain " + host + " is allowed");
                 return true;
             }
         }
-        Logger.debug("Domain " + host  + " is not allowed");
+        Logger.debug("Domain " + host + " is not allowed");
         return false;
     }
 
@@ -135,6 +135,6 @@ public class LinkUtils {
         if (url.matches("http://.*") || url.matches("https://.*")) {
             return;
         }
-        throw new IncorrectInputException();
+        throw new IncorrectInputException("Url neither http nor https!");
     }
 }

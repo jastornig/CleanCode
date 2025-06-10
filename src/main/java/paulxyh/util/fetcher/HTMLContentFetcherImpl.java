@@ -1,6 +1,5 @@
 package paulxyh.util.fetcher;
 
-import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import paulxyh.util.logger.Logger;
 

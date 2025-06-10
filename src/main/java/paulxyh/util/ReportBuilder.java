@@ -39,7 +39,7 @@ public class ReportBuilder {
         return "<br>" + addDepthIntent(depth);
     }
 
-    private String addDepthIntent(int depth) {
+    protected String addDepthIntent(int depth) {
         if (depth > 0) return "--".repeat(depth) + "> ";
         return "";
     }

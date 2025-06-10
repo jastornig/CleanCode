@@ -45,7 +45,7 @@ public class MarkdownWriterImpl implements MarkdownWriter {
         this.builder = builder;
     }
 
-    private void writeRecursively(PageResult page, int depth) throws WriterNotInitializedException {
+    protected void writeRecursively(PageResult page, int depth) throws WriterNotInitializedException {
         if (!checkWriterExists()) throw new WriterNotInitializedException();
         try {
             if (depth == 1) {
@@ -56,9 +56,9 @@ public class MarkdownWriterImpl implements MarkdownWriter {
             for (PageElement element : page.getElements()) {
                 if (element instanceof Heading heading) writeHeading(heading, depth);
                 else if (element instanceof Link link) {
-                     boolean recursive = !handledLinks.contains(link.url());
-                     handledLinks.add(link.url());
-                     handleLink(page, depth, link, recursive);
+                    boolean recursive = !handledLinks.contains(link.url());
+                    handledLinks.add(link.url());
+                    handleLink(page, depth, link, recursive);
                 }
             }
             writeEndOfPage(page.getUrl());
@@ -79,7 +79,7 @@ public class MarkdownWriterImpl implements MarkdownWriter {
         writeLink(link.url(), depth);
         writeDepth(depth + 1);
         PageResult child = page.getChildByUrl(link.url());
-        if(child != null && recursive){
+        if (child != null && recursive) {
             writeRecursively(child, depth + 1);
         }
     }
@@ -98,7 +98,7 @@ public class MarkdownWriterImpl implements MarkdownWriter {
             String text = this.builder.buildInputUrlText(url);
             this.writer.write(text);
         } catch (IOException e) {
-            throw new WriteExecutionException();
+            throw new WriteExecutionException("Error while writing input url!");
         }
     }
 
@@ -107,7 +107,7 @@ public class MarkdownWriterImpl implements MarkdownWriter {
             String text = this.builder.buildDepthText(depth);
             this.writer.write(text);
         } catch (IOException e) {
-            throw new WriteExecutionException();
+            throw new WriteExecutionException("Error while writing depth!");
         }
     }
 
@@ -116,7 +116,7 @@ public class MarkdownWriterImpl implements MarkdownWriter {
             String text = this.builder.buildStartOfPageText(url);
             this.writer.write(text);
         } catch (IOException e) {
-            throw new WriteExecutionException();
+            throw new WriteExecutionException("Error while writing start of the page!");
         }
     }
 
@@ -125,7 +125,7 @@ public class MarkdownWriterImpl implements MarkdownWriter {
             String text = this.builder.buildEndOfPageText(url);
             this.writer.write(text);
         } catch (IOException e) {
-            throw new WriteExecutionException();
+            throw new WriteExecutionException("Error while writing end of page!");
         }
     }
 
@@ -134,7 +134,7 @@ public class MarkdownWriterImpl implements MarkdownWriter {
             String text = this.builder.buildHeadingText(heading, depth);
             this.writer.write(text);
         } catch (IOException e) {
-            throw new WriteExecutionException();
+            throw new WriteExecutionException("Error while writing heading!");
         }
     }
 
@@ -143,7 +143,7 @@ public class MarkdownWriterImpl implements MarkdownWriter {
             String text = this.builder.buildLinkText(link, depth);
             this.writer.write(text);
         } catch (IOException e) {
-            throw new WriteExecutionException();
+            throw new WriteExecutionException("Error while writing link!");
         }
     }
 
@@ -152,7 +152,7 @@ public class MarkdownWriterImpl implements MarkdownWriter {
             String text = this.builder.buildBrokenLinkText(brokenLink, depth);
             this.writer.write(text);
         } catch (IOException e) {
-            throw new WriteExecutionException();
+            throw new WriteExecutionException("Error while writing broken link!");
         }
     }
 }

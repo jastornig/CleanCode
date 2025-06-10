@@ -34,7 +34,7 @@ public class HTMLParserImpl implements HTMLParser {
         } else if (element.tagName().equals("a")) {
             parseLink(element, htmlElements);
         } else {
-            throw new ElementNotRecognizedException();
+            throw new ElementNotRecognizedException("Element neither of type link nor heading!");
         }
     }
 
