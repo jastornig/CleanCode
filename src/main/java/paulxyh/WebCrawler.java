@@ -28,7 +28,7 @@ public class WebCrawler {
         argParser.addArgument("depth", "The maximum depth to crawl", true);
         argParser.addArgument("threads", "The number of threads to use. Default is 3", false);
         argParser.addArgument("verbose", "If additional information should be logged", false);
-        argParser.addTrailingArgs("domain","The domains to crawl", true);
+        argParser.addTrailingArgs("domain", "The domains to crawl", true);
 
         try {
             argParser.parse(args);
@@ -38,24 +38,35 @@ public class WebCrawler {
             System.exit(1);
         }
 
-        if(argParser.has("verbose")){
+        if (argParser.has("verbose")) {
             Logger.setLogLevel(Logger.Level.DEBUG);
         }
         int numThreads = 3;
-        if(argParser.has("threads")){
+        if (argParser.has("threads")) {
             try {
-                numThreads = Integer.parseInt(argParser.get("threads"));
+                if (argParser.get("threads").isEmpty()) {
+                    throw new NumberFormatException("No value for threads!");
+                }
+                numThreads = Integer.parseInt(argParser.get("threads").get());
             } catch (NumberFormatException e) {
                 Logger.error("Number of threads must be an integer.");
+                Logger.error(e.getMessage());
                 return;
             }
         }
 
-        String startUrl = argParser.get("url");
+        if (argParser.get("url").isEmpty()) {
+            Logger.error("Starting url must be given!");
+            return;
+        }
+        String startUrl = argParser.get("url").get();
         int maxDepth;
         try {
             LinkUtils.checkUrlFormatting(startUrl);
-            maxDepth = Integer.parseInt(argParser.get("depth"));
+            if (argParser.get("depth").isEmpty()) {
+                throw new NumberFormatException("No value for depth!");
+            }
+            maxDepth = Integer.parseInt(argParser.get("depth").get());
         } catch (IncorrectInputException i) {
             Logger.error("Input URL must contain 'https://' or 'http://'!");
             return;

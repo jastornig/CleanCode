@@ -17,7 +17,7 @@ public class CrawlerEngine {
     private final Set<String> visitedUrls = ConcurrentHashMap.newKeySet();
     private final CrawlTaskExecutor crawlTaskExecutor;
     private final int maxDepth;
-    private PageResult finalResult;
+    private Optional<PageResult> finalResult;
     private final HTMLParser htmlParser;
     private boolean crawlingFailed = false;
 
@@ -28,87 +28,85 @@ public class CrawlerEngine {
         this.htmlParser = parser;
     }
 
-    public boolean isFailure(){
+    public boolean isFailure() {
         return crawlingFailed;
     }
 
-    public PageResult crawl(String url) {
-        if(maxDepth == 0)
-            return null;
+    public Optional<PageResult> crawl(String url) {
+        if (maxDepth == 0)
+            return Optional.empty();
         submitTask(() -> processInitialPage(url));
         crawlTaskExecutor.waitForAllTasksToFinish();
         crawlTaskExecutor.shutdown();
         return finalResult;
     }
 
-    private synchronized void submitTask(Runnable task){
+    private synchronized void submitTask(Runnable task) {
         crawlTaskExecutor.submitTask(task);
     }
 
-    private boolean shouldCrawl(Link link, int currentDepth){
+    private boolean shouldCrawl(Link link, int currentDepth) {
         synchronized (visitedUrls) {
-            if(visitedUrls.contains(link.url())){
+            if (visitedUrls.contains(link.url())) {
                 Logger.debug("URL " + link.url() + " already visited! Stepping over!");
                 return false;
             }
         }
-        if(currentDepth >= maxDepth){
+        if (currentDepth >= maxDepth) {
             Logger.debug("URL " + link.url() + " exceeds max depth! (" + currentDepth + " >= " + maxDepth + ")");
             return false;
         }
         return link.isValid();
     }
 
-    private void processInitialPage(String url){
+    private void processInitialPage(String url) {
         visitedUrls.add(url);
-        PageResult initialPage = crawlSinglePage(url, 1);
+        Optional<PageResult> initialPage = crawlSinglePage(url, 1);
         this.finalResult = initialPage;
-        if(initialPage == null){
+        if (initialPage.isEmpty()) {
             Logger.error("Initial page could not be crawled!");
             crawlingFailed = true;
             return;
         }
+        processPageContentInternal(initialPage.get());
+    }
+
+    private void processPageContentInternal(PageResult initialPage) {
         List<Link> links = initialPage.getLinks();
         for (Link link : links) {
-            if(shouldCrawl(link, initialPage.getDepth())){
+            if (shouldCrawl(link, initialPage.getDepth())) {
                 visitedUrls.add(link.url());
-                submitTask(()->processChildPage(link.url(), initialPage));
+                submitTask(() -> processChildPage(link.url(), initialPage));
             }
         }
     }
 
-    private void processChildPage(String url, PageResult parentPage){
-        PageResult page = crawlSinglePage(url, parentPage.getDepth() + 1);
-        if(page == null){
+    private void processChildPage(String url, PageResult parentPage) {
+        Optional<PageResult> page = crawlSinglePage(url, parentPage.getDepth() + 1);
+        if (page.isEmpty()) {
             Logger.warn("Child page " + url + " could not be crawled!");
             return;
         }
-        parentPage.addChild(page);
-        List<Link> links = page.getLinks();
-        for (Link link : links) {
-            if(shouldCrawl(link, page.getDepth())){
-                visitedUrls.add(link.url());
-                submitTask(()->processChildPage(link.url(), page));
-            }
-        }
+        parentPage.addChild(page.get());
+        processPageContentInternal(page.get());
     }
 
-    private PageResult crawlSinglePage(String url, int currentDepth){
+    private Optional<PageResult> crawlSinglePage(String url, int currentDepth) {
         Logger.info("Fetching HTML content for URL: " + url);
-        Document htmlContent = fetcher.fetch(url);
-        if(htmlContent == null){
+        Optional<Document> htmlContent = fetcher.fetch(url);
+        if (htmlContent.isEmpty()) {
             Logger.warn("No HTML Content for " + url + " fetched! Exiting path...");
-            return null;
+            return Optional.empty();
         }
         PageResult result = new PageResult(url, currentDepth);
         try {
-            List<PageElement> elements = htmlParser.parse(url, htmlContent);
+            List<PageElement> elements = htmlParser.parse(url, htmlContent.get());
             for (PageElement element : elements) {
                 result.addElement(element);
             }
         } catch (ElementNotRecognizedException e) {
             Logger.error("Error while parsing: " + e.getMessage());
         }
-        return result;
+        return Optional.of(result);
     }
 }

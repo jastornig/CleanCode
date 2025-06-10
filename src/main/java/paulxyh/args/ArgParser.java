@@ -31,11 +31,12 @@ public class ArgParser {
     private String trailingArgsName = null;
 
     public void addArgument(String name, String description, boolean required) {
-        if(arguments.containsKey(name)) {
+        if (arguments.containsKey(name)) {
             throw new IllegalArgumentException("Argument " + name + " already exists");
         }
         arguments.put(name, new Argument(name, description, required));
     }
+
     public void addTrailingArgs(String name, String description, boolean required) {
         this.trailingArgsName = name;
         this.trailingArgsDescription = description;
@@ -85,10 +86,10 @@ public class ArgParser {
     }
 
 
-    public String getSynopsis(){
+    public String getSynopsis() {
         StringBuilder sb = new StringBuilder();
         sb.append("Usage: [options] ");
-        if(allowTrailingArgs) {
+        if (allowTrailingArgs) {
             sb
                     .append("[")
                     .append(trailingArgsName)
@@ -97,28 +98,28 @@ public class ArgParser {
                     .append("] ...]");
         }
         sb.append("\nOptions:\n");
-        for(Argument arg : arguments.values()) {
+        for (Argument arg : arguments.values()) {
             sb.append("  --").append(arg.name).append("  ").append(arg.description);
-            if(arg.required) {
+            if (arg.required) {
                 sb.append(" (required)");
             }
             sb.append("\n");
         }
         sb.append("  ").append(trailingArgsName).append("(s) ").append(trailingArgsDescription);
-        if(trailingArgsRequired) {
+        if (trailingArgsRequired) {
             sb.append(" (required)");
         }
         sb.append("\n");
         return sb.toString();
     }
 
-    public String get(String name){
+    public Optional<String> get(String name) {
         Argument arg = arguments.get(name);
-        if(arg == null || !arg.isSet()) return null;
-        return arg.value;
+        if (arg == null || !arg.isSet()) return Optional.empty();
+        return Optional.of(arg.value);
     }
 
-    public boolean has(String name){
+    public boolean has(String name) {
         Argument arg = arguments.get(name);
         return arg != null && arg.isSet();
     }

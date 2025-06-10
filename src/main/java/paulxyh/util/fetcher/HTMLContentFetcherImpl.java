@@ -7,6 +7,7 @@ import paulxyh.util.logger.Logger;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.util.Optional;
 
 public class HTMLContentFetcherImpl implements HTMLContentFetcher {
     private final JsoupWrapper wrapper;
@@ -17,19 +18,19 @@ public class HTMLContentFetcherImpl implements HTMLContentFetcher {
     }
 
     @Override
-    public Document fetch(String url) {
+    public Optional<Document> fetch(String url) {
         try {
             if (url.startsWith("file:")) {
                 Logger.info("Fetching from local file: " + url);
                 File file = new File(URI.create(url));
-                return wrapper.parse(file, CHARSET, url);
+                return Optional.of(wrapper.parse(file, CHARSET, url));
             } else if (url.startsWith("https://") || url.startsWith("http://")) {
-                return wrapper.connect(url);
+                return Optional.of(wrapper.connect(url));
             }
-            return null;
+            return Optional.empty();
         } catch (IOException e) {
             Logger.error("Error while fetching HTML content: " + e.getMessage());
-            return null;
+            return Optional.empty();
         }
     }
 }

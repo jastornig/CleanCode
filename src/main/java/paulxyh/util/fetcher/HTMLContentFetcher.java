@@ -2,6 +2,8 @@ package paulxyh.util.fetcher;
 
 import org.jsoup.nodes.Document;
 
+import java.util.Optional;
+
 public interface HTMLContentFetcher {
-    Document fetch(String url);
+    Optional<Document> fetch(String url);
 }

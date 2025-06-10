@@ -7,6 +7,7 @@ import paulxyh.util.logger.Logger;
 import paulxyh.util.writer.MarkdownWriter;
 
 import java.util.List;
+import java.util.Optional;
 
 public class CrawlerController {
     private final String filename;
@@ -22,12 +23,16 @@ public class CrawlerController {
     public void run(String url, List<String> allowedDomains) {
         Logger.info("Crawler started");
         LinkUtils.setAllowedDomains(allowedDomains);
-        PageResult result = engine.crawl(url);
-        if(engine.isFailure()){
+        Optional<PageResult> result = engine.crawl(url);
+        if (engine.isFailure()) {
             Logger.error("Crawling failed");
-        }else {
+        } else {
+            if (result.isEmpty()) {
+                Logger.warn("Empty result!");
+                return;
+            }
             Logger.info("Writing results to " + filename);
-            writer.write(result, filename);
+            writer.write(result.get(), filename);
         }
     }
 }
