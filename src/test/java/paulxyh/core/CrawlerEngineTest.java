@@ -40,7 +40,7 @@ public class CrawlerEngineTest {
     }
 
     @Test
-    @DisplayName("cawl() should lead to failure, when fetcher returns null")
+    @DisplayName("crawl() should lead to failure, when fetcher returns null")
     void testCrawlThrowsExceptionWhenFetcherReturnsNull() {
         CrawlerEngine engine = new CrawlerEngine(fetcher, parser, new CrawlTaskExecutor(10), 1);
         String url = "https://paulxyh.test.url";

@@ -126,10 +126,9 @@ public class LinkUtilsTest {
     }
 
     @Test
-    public void testCheckUrlFormatting_validUrl() throws IncorrectInputException {
+    public void testCheckUrlFormatting_validUrl() {
         String url = "https://paulxyh.test.url";
-        // no assertion needed -> throws error when wrong
-        LinkUtils.checkUrlFormatting(url);
+        assertDoesNotThrow(() -> LinkUtils.checkUrlFormatting(url));
     }
 
     @Test
