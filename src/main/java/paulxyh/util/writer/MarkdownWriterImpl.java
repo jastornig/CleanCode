@@ -6,7 +6,6 @@ import paulxyh.model.Heading;
 import paulxyh.model.Link;
 import paulxyh.model.PageElement;
 import paulxyh.model.PageResult;
-import paulxyh.util.LinkUtils;
 import paulxyh.util.ReportBuilder;
 import paulxyh.util.logger.Logger;
 
