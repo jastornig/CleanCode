@@ -29,8 +29,9 @@ public class LinkUtils {
     public static String normalizeLinkAndRemoveFragment(String url) {
         URI uri = URI.create(url);
         try {
-            String schemeSpecificPart = uri.getSchemeSpecificPart().replaceFirst("^//www.", "//");
-            //String schemeSpecificPart = uri.getSchemeSpecificPart();
+            String schemeSpecificPart = uri.getSchemeSpecificPart()
+                    .replaceFirst("^//www.", "//")
+                    .replaceFirst("/$", "");
             uri = new URI(uri.getScheme(), schemeSpecificPart, null);
         } catch (URISyntaxException e) {
             Logger.warn("Error while normalizing URL. Using unnormalized instead: " + e.getMessage());
@@ -63,7 +64,7 @@ public class LinkUtils {
             checkedUrls.put(link, false);
             return false;
         } catch (IOException e) {
-            Logger.error("Url could not be checked: " + e.getMessage());
+            Logger.error("Url " + link + " could not be checked: " + e.getMessage());
             checkedUrls.put(link, false);
             return false;
         }
@@ -110,6 +111,9 @@ public class LinkUtils {
     private static boolean checkReachable(URL url) throws IOException {
         HttpURLConnection httpURLConnection = urlConnectionWrapper.openConnection(url);
         httpURLConnection.setRequestMethod("HEAD");
+        httpURLConnection.setConnectTimeout(10000); // 10 seconds
+        httpURLConnection.setInstanceFollowRedirects(true);
+        httpURLConnection.connect();
         int responseCode = httpURLConnection.getResponseCode();
         if (responseCode == HttpURLConnection.HTTP_OK) {
             Logger.debug(url + " is reachable");

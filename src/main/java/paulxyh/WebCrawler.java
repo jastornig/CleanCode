@@ -17,7 +17,6 @@ import paulxyh.util.parser.HTMLParserImpl;
 import paulxyh.util.writer.MarkdownWriter;
 import paulxyh.util.writer.MarkdownWriterImpl;
 
-import java.net.HttpURLConnection;
 import java.util.List;
 
 public class WebCrawler {
@@ -76,7 +75,6 @@ public class WebCrawler {
         }
 
         List<String> allowedDomains = argParser.getTrailingArgs();
-        HttpURLConnection.setFollowRedirects(true);
         Logger.info("Initializing Crawler with url: " + startUrl + " and " + numThreads + " threads");
         JsoupWrapper wrapper = new JsoupWrapperImpl();
         HTMLContentFetcher fetcher = new HTMLContentFetcherImpl(wrapper);

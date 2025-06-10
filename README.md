@@ -8,13 +8,13 @@ Beneath the folder `resources` a file with the name `RunWebCrawler.xml` can be f
 Another way to run the WebCrawler is to run the following maven command manually inside the root directory:
 
 ```bash
-mvn clean install -Dexec.mainClass=paulxyh.WebCrawler -Dexec.args="<url> <depth> <domains>"
+mvn clean install -Dexec.mainClass=paulxyh.WebCrawler -Dexec.args="--url=<url> --depth=<depth> [--threads=<numThreads>] [--verbose] <domain1> [<domain2> ...]"
 ```
-
 * `url` => The root url which the Crawler should target
 * `depth` => The maximal depth the Crawler should go
-* `domains` => A comma seperated list of all possible domains
-
+* `threads` => The number of threads the Crawler should use (default: 3)
+* `verbose` => If set, the Crawler will print additional debug information
+* `domain1`, `domain2`, ... => The domains which the Crawler should target (seperated by spaces)
 **I included the maven plugin `exec` in my build process so please do not run `mvn clean install exec:java ...`, otherwise the crawling will be executed twice, which should be fine, as the file is just overwritten, but will use extra processing time**
 
 ## Testing

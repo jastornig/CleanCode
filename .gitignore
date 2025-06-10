@@ -4,6 +4,9 @@
 # Log file
 *.log
 
+# Expected output
+**/expected_output.md
+
 # BlueJ files
 *.ctxt
 

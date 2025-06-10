@@ -5,6 +5,7 @@ import paulxyh.exception.ElementNotRecognizedException;
 import paulxyh.model.Link;
 import paulxyh.model.PageElement;
 import paulxyh.model.PageResult;
+import paulxyh.util.LinkUtils;
 import paulxyh.util.fetcher.HTMLContentFetcher;
 import paulxyh.util.logger.Logger;
 import paulxyh.util.parser.HTMLParser;
@@ -35,7 +36,8 @@ public class CrawlerEngine {
     public Optional<PageResult> crawl(String url) {
         if (maxDepth == 0)
             return Optional.empty();
-        submitTask(() -> processInitialPage(url));
+        String normalizedUrl = LinkUtils.normalizeLinkAndRemoveFragment(url);
+        submitTask(() -> processInitialPage(normalizedUrl));
         crawlTaskExecutor.waitForAllTasksToFinish();
         crawlTaskExecutor.shutdown();
         return finalResult;

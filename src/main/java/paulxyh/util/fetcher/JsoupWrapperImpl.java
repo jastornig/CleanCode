@@ -10,7 +10,7 @@ public class JsoupWrapperImpl implements JsoupWrapper {
 
     @Override
     public Document connect(String url) throws IOException {
-        return Jsoup.connect(url).get();
+        return Jsoup.connect(url).followRedirects(true).get();
     }
 
     @Override
