@@ -15,6 +15,7 @@ import paulxyh.util.fetcher.HTMLContentFetcher;
 import paulxyh.util.parser.HTMLParser;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
@@ -34,8 +35,8 @@ public class CrawlerEngineTest {
     @DisplayName("crawl() should return empty PageResult for depth 0")
     void testCrawlReturnsEmptyPageResult() {
         CrawlerEngine engine = new CrawlerEngine(fetcher, parser, new CrawlTaskExecutor(10), 0);
-        PageResult result = engine.crawl("testUrl");
-        assertNull(result);
+        Optional<PageResult> result = engine.crawl("testUrl");
+        assertTrue(result.isEmpty());
     }
 
     @Test
@@ -43,10 +44,10 @@ public class CrawlerEngineTest {
     void testCrawlThrowsExceptionWhenFetcherReturnsNull() {
         CrawlerEngine engine = new CrawlerEngine(fetcher, parser, new CrawlTaskExecutor(10), 1);
         String url = "https://paulxyh.test.url";
-        when(fetcher.fetch(url)).thenReturn(null);
-        PageResult result = engine.crawl(url);
+        when(fetcher.fetch(url)).thenReturn(Optional.empty());
+        Optional<PageResult> result = engine.crawl(url);
         assertTrue(engine.isFailure());
-        assertNull(result);
+        assertTrue(result.isEmpty());
     }
 
     @Test
@@ -54,9 +55,9 @@ public class CrawlerEngineTest {
     void testCrawlReturnsEmptyPageResultForEmptyWebsite() {
         CrawlerEngine engine = new CrawlerEngine(fetcher, parser, new CrawlTaskExecutor(10), 1);
         String url = "https://paulxyh.test.url";
-        when(fetcher.fetch(url)).thenReturn(null);
-        PageResult result = engine.crawl(url);
-        assertNull(result);
+        when(fetcher.fetch(url)).thenReturn(Optional.empty());
+        Optional<PageResult> result = engine.crawl(url);
+        assertTrue(result.isEmpty());
     }
 
     @Test
@@ -71,9 +72,9 @@ public class CrawlerEngineTest {
         Document mockedDocument = Jsoup.parse(html);
         Heading mockedHeading = new Heading(1, "TestHeading");
         Link mockedLink = new Link(url, true);
-        when(fetcher.fetch(url)).thenReturn(mockedDocument);
+        when(fetcher.fetch(url)).thenReturn(Optional.of(mockedDocument));
         when(parser.parse(url, mockedDocument)).thenReturn(List.of(mockedHeading, mockedLink));
-        PageResult result = engine.crawl(url);
+        PageResult result = engine.crawl(url).get();
         assertEquals(url, result.getUrl());
         assertEquals(1, result.getDepth());
         assertEquals(2, result.getElements().size());
@@ -100,17 +101,17 @@ public class CrawlerEngineTest {
         Document mockedDocument = Jsoup.parse(html);
         Heading mockedHeading = new Heading(1, "TestHeading");
         Link mockedLink = new Link(urlDeeper, true);
-        when(fetcher.fetch(url)).thenReturn(mockedDocument);
+        when(fetcher.fetch(url)).thenReturn(Optional.of(mockedDocument));
         when(parser.parse(url, mockedDocument)).thenReturn(List.of(mockedHeading, mockedLink));
 
 
         Document mockedDocumentDeeper = Jsoup.parse(htmlDeeper);
         Heading mockedHeadingDeeper = new Heading(1, "TestHeadingDeeper");
         Link mockedLinkDeeper = new Link(url, true);
-        when(fetcher.fetch(urlDeeper)).thenReturn(mockedDocumentDeeper);
+        when(fetcher.fetch(urlDeeper)).thenReturn(Optional.of(mockedDocumentDeeper));
         when(parser.parse(urlDeeper, mockedDocumentDeeper)).thenReturn(List.of(mockedHeadingDeeper, mockedLinkDeeper));
 
-        PageResult result = engine.crawl(url);
+        PageResult result = engine.crawl(url).get();
         assertEquals(url, result.getUrl());
         assertEquals(1, result.getDepth());
         assertEquals(2, result.getElements().size());

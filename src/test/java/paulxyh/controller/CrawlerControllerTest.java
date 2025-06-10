@@ -12,6 +12,7 @@ import paulxyh.model.PageResult;
 import paulxyh.util.writer.MarkdownWriterImpl;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.mockito.Mockito.*;
 
@@ -28,14 +29,15 @@ public class CrawlerControllerTest {
     CrawlerController controller;
 
     @BeforeEach
-    void init(){
+    void init() {
         controller = new CrawlerController(engine, writer);
     }
+
     @Test
     @DisplayName("Verify engine.start() and writer.write() are called")
-    void testRunCallsEngineAndWriter(){
+    void testRunCallsEngineAndWriter() {
         PageResult mockResult = mock(PageResult.class);
-        when(engine.crawl(testUrl)).thenReturn(mockResult);
+        when(engine.crawl(testUrl)).thenReturn(Optional.of(mockResult));
 
         controller.run(testUrl, List.of("paulxyh", "test", "url"));
 

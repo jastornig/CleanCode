@@ -13,8 +13,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Paths;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
@@ -40,7 +39,7 @@ public class HTMLContentFetcherTest {
     @DisplayName("fetch() should return a document from https://paulxyh.test.url")
     void testFetchReturnsDocumentFromSafeWebsite() throws IOException {
         when(wrapper.connect(anyString())).thenReturn(mockDocument);
-        assertNotNull(this.fetcher.fetch(TEST_URL_SAFE));
+        assertFalse(this.fetcher.fetch(TEST_URL_SAFE).isEmpty());
         verify(wrapper, times(1)).connect(TEST_URL_SAFE);
     }
 
@@ -48,7 +47,7 @@ public class HTMLContentFetcherTest {
     @DisplayName("fetch() should return a document from http://paulxyh.test.url")
     void testFetchReturnsDocumentFromUnsafeWebsite() throws IOException {
         when(wrapper.connect(anyString())).thenReturn(mockDocument);
-        assertNotNull(fetcher.fetch(TEST_URL_UNSAFE));
+        assertFalse(fetcher.fetch(TEST_URL_UNSAFE).isEmpty());
         verify(wrapper, times(1)).connect(TEST_URL_UNSAFE);
     }
 
@@ -58,20 +57,20 @@ public class HTMLContentFetcherTest {
         URI uri = Paths.get("src/test/resources/testpage/index.html").toAbsolutePath().toUri();
         String startUrl = uri.toString();
         when(wrapper.parse(any(), anyString(), anyString())).thenReturn(mockDocument);
-        assertNotNull(fetcher.fetch(startUrl));
+        assertFalse(fetcher.fetch(startUrl).isEmpty());
         verify(wrapper, times(1)).parse(any(), anyString(), anyString());
     }
 
     @Test
-    @DisplayName("fetch() should return null for ftp:// url")
-    void testFetchReturnsNullForFTPUrl(){
-        assertNull(fetcher.fetch("ftp://test.url.return.null"));
+    @DisplayName("fetch() should return Optional.empty() for ftp:// url")
+    void testFetchReturnsNullForFTPUrl() {
+        assertTrue(fetcher.fetch("ftp://test.url.return.null").isEmpty());
     }
 
     @Test
-    @DisplayName("fetch() should return null for mailto: url")
-    void testFetchReturnsNullForMailtoUrl(){
-        assertNull(fetcher.fetch("mailto:k.paulxyh@gmail.com"));
+    @DisplayName("fetch() should return Optional.empty() for mailto: url")
+    void testFetchReturnsNullForMailtoUrl() {
+        assertTrue(fetcher.fetch("mailto:k.paulxyh@gmail.com").isEmpty());
     }
 
 }

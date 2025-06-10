@@ -20,7 +20,9 @@ import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -52,10 +54,12 @@ public class WebCrawlerIntegrationTest {
         CrawlerController crawler = new CrawlerController(engine, writer);
         crawler.run(startUrl, allowedDomains);
 
-        assertTrue(Files.exists(OUTPUT_PATH), "Report file should be generated.");
+        // to make the test independent of local file paths
+        String prefix = "input: <a>" + uri.toString() + "</a>\n";
 
+        assertTrue(Files.exists(OUTPUT_PATH), "Report file should be generated.");
+        String expectedContent = prefix + Files.readString(EXPECTED_CONTENT_PATH);
         String content = Files.readString(OUTPUT_PATH);
-        String expectedContent = Files.readString(EXPECTED_CONTENT_PATH);
         assertEquals(expectedContent.trim(), content.trim());
     }
 }
